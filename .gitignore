@@ -1,0 +1,26 @@
+# C++
+build/
+bin/
+obj/
+*.o
+*.obj
+*.exe
+*.ilk
+*.pdb
+*.user
+.vs/
+
+# Java
+out/
+target/
+*.class
+*.jar
+
+# IDE
+.idea/
+.vscode/
+cmake-build-debug/
+
+# ОС
+Thumbs.db
+.DS_Store
