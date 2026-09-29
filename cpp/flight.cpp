@@ -1,0 +1,70 @@
+#include "flight.hpp"
+
+#include <iostream>
+
+namespace baggage
+{
+
+Flight::Flight(const std::string& number, const std::string& fromAirport, const std::string& toAirport,
+               int capacityPlaces, double maxTotalWeightKg)
+    : m_number{ number }
+    , m_fromAirport{ fromAirport }
+    , m_toAirport{ toAirport }
+    , m_capacityPlaces{ capacityPlaces }
+    , m_maxTotalWeightKg{ maxTotalWeightKg }
+    , m_checkInClosed{ false }
+    , m_manifest{}
+{
+    std::cout << "[Рейс] Открыт рейс " << m_number << " (" << m_fromAirport << " -> " << m_toAirport
+              << "): вместимость " << m_capacityPlaces << " мест, лимит веса " << m_maxTotalWeightKg << " кг\n";
+}
+
+Flight::~Flight()
+{
+    std::cout << "[Рейс] Рейс " << m_number << " закрыт; мест в манифесте: " << m_manifest.size()
+              << " (места багажа рейсу не принадлежат)\n";
+}
+
+bool Flight::AddBaggage(BaggagePiece& piece)
+{
+    m_manifest.push_back(&piece);
+    std::cout << "[Рейс] Место багажа " << piece.GetTagNumber() << " назначено на рейс " << m_number << " (мест: "
+              << m_manifest.size() << " из " << m_capacityPlaces << ")\n";
+    return true;
+}
+
+bool Flight::RemoveBaggage(const std::string& tagNumber)
+{
+    for (std::size_t i = 0; i < m_manifest.size(); ++i)
+    {
+        if (m_manifest[i]->GetTagNumber() == tagNumber)
+        {
+            std::cout << "[Рейс] Место багажа " << tagNumber << " снято с рейса " << m_number << "\n";
+            m_manifest.erase(m_manifest.begin() + static_cast<std::ptrdiff_t>(i));
+            return true;
+        }
+    }
+
+    std::cout << "[Рейс] Место багажа " << tagNumber << " не найдено в манифесте рейса " << m_number << "\n";
+    return false;
+}
+
+void Flight::CloseCheckIn()
+{
+    m_checkInClosed = true;
+    std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта\n";
+}
+
+void Flight::PrintManifest() const
+{
+    std::cout << "[Рейс] Манифест рейса " << m_number << " (" << m_fromAirport << " -> " << m_toAirport << "): мест "
+              << m_manifest.size() << " из " << m_capacityPlaces << "\n";
+
+    for (const BaggagePiece* piece : m_manifest)
+    {
+        std::cout << "  ";
+        piece->PrintState();
+    }
+}
+
+} // namespace baggage
