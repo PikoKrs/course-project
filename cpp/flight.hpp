@@ -34,6 +34,8 @@ public:
     void PrintManifest() const;
 
 private:
+    [[nodiscard]] double LoadedWeightKg() const noexcept;
+
     std::string m_number;
     std::string m_fromAirport;
     std::string m_toAirport;

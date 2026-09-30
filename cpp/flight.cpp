@@ -27,9 +27,31 @@ Flight::~Flight()
 
 bool Flight::AddBaggage(BaggagePiece& piece)
 {
+    if (m_checkInClosed)
+    {
+        std::cout << "[Рейс] Отказ: регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
+        return false;
+    }
+
+    if (LoadedCount() >= m_capacityPlaces)
+    {
+        std::cout << "[Рейс] Отказ: вместимость отсека рейса " << m_number << " исчерпана (" << m_capacityPlaces
+                  << " мест), назначение места багажа " << piece.GetTagNumber() << " невозможно (правило 7)\n";
+        return false;
+    }
+
+    const double newTotalWeight = LoadedWeightKg() + piece.GetWeightKg();
+    if (newTotalWeight > m_maxTotalWeightKg)
+    {
+        std::cout << "[Рейс] Отказ: суммарный вес багажа рейса " << m_number << " (" << newTotalWeight
+                  << " кг) превысил бы лимит " << m_maxTotalWeightKg << " кг (правило 7)\n";
+        return false;
+    }
+
     m_manifest.push_back(&piece);
     std::cout << "[Рейс] Место багажа " << piece.GetTagNumber() << " назначено на рейс " << m_number << " (мест: "
-              << m_manifest.size() << " из " << m_capacityPlaces << ")\n";
+              << m_manifest.size() << " из " << m_capacityPlaces << ", вес: " << newTotalWeight << " из "
+              << m_maxTotalWeightKg << " кг)\n";
     return true;
 }
 
@@ -51,8 +73,24 @@ bool Flight::RemoveBaggage(const std::string& tagNumber)
 
 void Flight::CloseCheckIn()
 {
+    if (m_checkInClosed)
+    {
+        std::cout << "[Рейс] Регистрация на рейс " << m_number << " уже закрыта\n";
+        return;
+    }
+
     m_checkInClosed = true;
-    std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта\n";
+    std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
+}
+
+double Flight::LoadedWeightKg() const noexcept
+{
+    double total = 0.0;
+    for (const BaggagePiece* piece : m_manifest)
+    {
+        total += piece->GetWeightKg();
+    }
+    return total;
 }
 
 void Flight::PrintManifest() const

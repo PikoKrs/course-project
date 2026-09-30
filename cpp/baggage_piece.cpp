@@ -64,6 +64,20 @@ BaggagePiece::~BaggagePiece()
 
 bool BaggagePiece::AcceptAtCheckIn()
 {
+    if (m_weightKg > 32.0)
+    {
+        std::cout << "[Место] Отказ: вес места багажа " << m_weightKg << " кг превышает предельные 32 кг (правило 4),"
+                     " место не принимается\n";
+        return false;
+    }
+
+    if (m_status != BaggageStatus::eNone)
+    {
+        std::cout << "[Место] Отказ: место багажа " << m_tag.GetNumber() << " уже в обработке (статус: "
+                  << StatusName(m_status) << ")\n";
+        return false;
+    }
+
     m_status = BaggageStatus::eAccepted;
     std::cout << "[Место] Место багажа " << m_tag.GetNumber() << " принято на рейс (вес " << m_weightKg
               << " кг), статус: принято\n";
@@ -72,6 +86,33 @@ bool BaggagePiece::AcceptAtCheckIn()
 
 bool BaggagePiece::MarkStatus(BaggageStatus newStatus)
 {
+    const bool newIsProblem =
+        newStatus == BaggageStatus::eDelayed || newStatus == BaggageStatus::eLost
+        || newStatus == BaggageStatus::eRemoved;
+    const bool currentIsProblem =
+        m_status == BaggageStatus::eDelayed || m_status == BaggageStatus::eLost || m_status == BaggageStatus::eRemoved;
+
+    if (newStatus == m_status)
+    {
+        std::cout << "[Место] Бирка " << m_tag.GetNumber() << ": статус уже " << StatusName(m_status) << "\n";
+        return false;
+    }
+
+    if (m_status == BaggageStatus::eNone && newStatus != BaggageStatus::eAccepted)
+    {
+        std::cout << "[Место] Отказ: место багажа " << m_tag.GetNumber()
+                  << " ещё не принято, первый статус должен быть \"принято\" (правило 12)\n";
+        return false;
+    }
+
+    if (!newIsProblem && !currentIsProblem && newStatus != BaggageStatus::eNone
+        && static_cast<int>(newStatus) < static_cast<int>(m_status))
+    {
+        std::cout << "[Место] Отказ: статус места багажа не меняется в обратную сторону: " << StatusName(m_status)
+                  << " -> " << StatusName(newStatus) << " (правило 12)\n";
+        return false;
+    }
+
     m_status = newStatus;
     std::cout << "[Место] Бирка " << m_tag.GetNumber() << ": новый статус: " << StatusName(newStatus) << "\n";
     return true;
