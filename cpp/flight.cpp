@@ -25,7 +25,7 @@ Flight::~Flight()
               << " (места багажа рейсу не принадлежат)\n";
 }
 
-bool Flight::AddBaggage(BaggagePiece& piece)
+bool Flight::AddBaggage(const std::shared_ptr<BaggagePiece>& piece)
 {
     if (m_checkInClosed)
     {
@@ -36,11 +36,11 @@ bool Flight::AddBaggage(BaggagePiece& piece)
     if (LoadedCount() >= m_capacityPlaces)
     {
         std::cout << "[Рейс] Отказ: вместимость отсека рейса " << m_number << " исчерпана (" << m_capacityPlaces
-                  << " мест), назначение места багажа " << piece.GetTagNumber() << " невозможно (правило 7)\n";
+                  << " мест), назначение места багажа " << piece->GetTagNumber() << " невозможно (правило 7)\n";
         return false;
     }
 
-    const double newTotalWeight = LoadedWeightKg() + piece.GetWeightKg();
+    const double newTotalWeight = LoadedWeightKg() + piece->GetWeightKg();
     if (newTotalWeight > m_maxTotalWeightKg)
     {
         std::cout << "[Рейс] Отказ: суммарный вес багажа рейса " << m_number << " (" << newTotalWeight
@@ -48,8 +48,8 @@ bool Flight::AddBaggage(BaggagePiece& piece)
         return false;
     }
 
-    m_manifest.push_back(&piece);
-    std::cout << "[Рейс] Место багажа " << piece.GetTagNumber() << " назначено на рейс " << m_number << " (мест: "
+    m_manifest.emplace_back(piece);
+    std::cout << "[Рейс] Место багажа " << piece->GetTagNumber() << " назначено на рейс " << m_number << " (мест: "
               << m_manifest.size() << " из " << m_capacityPlaces << ", вес: " << newTotalWeight << " из "
               << m_maxTotalWeightKg << " кг)\n";
     return true;
@@ -59,7 +59,8 @@ bool Flight::RemoveBaggage(const std::string& tagNumber)
 {
     for (std::size_t i = 0; i < m_manifest.size(); ++i)
     {
-        if (m_manifest[i]->GetTagNumber() == tagNumber)
+        const std::shared_ptr<BaggagePiece> piece = m_manifest[i].lock();
+        if (piece && piece->GetTagNumber() == tagNumber)
         {
             std::cout << "[Рейс] Место багажа " << tagNumber << " снято с рейса " << m_number << "\n";
             m_manifest.erase(m_manifest.begin() + static_cast<std::ptrdiff_t>(i));
@@ -83,26 +84,36 @@ void Flight::CloseCheckIn()
     std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
 }
 
-double Flight::LoadedWeightKg() const noexcept
-{
-    double total = 0.0;
-    for (const BaggagePiece* piece : m_manifest)
-    {
-        total += piece->GetWeightKg();
-    }
-    return total;
-}
-
 void Flight::PrintManifest() const
 {
     std::cout << "[Рейс] Манифест рейса " << m_number << " (" << m_fromAirport << " -> " << m_toAirport << "): мест "
               << m_manifest.size() << " из " << m_capacityPlaces << "\n";
 
-    for (const BaggagePiece* piece : m_manifest)
+    for (const std::weak_ptr<BaggagePiece>& entry : m_manifest)
     {
+        const std::shared_ptr<BaggagePiece> piece = entry.lock();
+        if (!piece)
+        {
+            std::cout << "  [Место] место багажа недоступно: владелец его уничтожил (weak_ptr lock() пуст)\n";
+            continue;
+        }
+
         std::cout << "  ";
         piece->PrintState();
     }
+}
+
+double Flight::LoadedWeightKg() const noexcept
+{
+    double total = 0.0;
+    for (const std::weak_ptr<BaggagePiece>& entry : m_manifest)
+    {
+        if (const std::shared_ptr<BaggagePiece> piece = entry.lock())
+        {
+            total += piece->GetWeightKg();
+        }
+    }
+    return total;
 }
 
 } // namespace baggage

@@ -2,6 +2,7 @@
 
 #include "baggage_piece.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -17,7 +18,7 @@ public:
     Flight& operator=(const Flight&) = delete;
     ~Flight();
 
-    bool AddBaggage(BaggagePiece& piece);
+    bool AddBaggage(const std::shared_ptr<BaggagePiece>& piece);
     bool RemoveBaggage(const std::string& tagNumber);
     void CloseCheckIn();
 
@@ -42,7 +43,7 @@ private:
     int m_capacityPlaces;
     double m_maxTotalWeightKg;
     bool m_checkInClosed;
-    std::vector<BaggagePiece*> m_manifest;
+    std::vector<std::weak_ptr<BaggagePiece>> m_manifest;
 };
 
 } // namespace baggage

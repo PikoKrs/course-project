@@ -3,88 +3,79 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 int main()
 {
     std::system("chcp 65001 >nul");
 
-    std::cout << "=== ЛР2. Сценарий 1: приём багажа на рейс ===\n\n";
+    std::cout << "=== ЛР3 ч.2. Сценарий 1: приём багажа на рейс (умные указатели) ===\n\n";
 
     std::cout << "--- 1. Рейс и приём мест в норме ---\n";
     baggage::Flight flight{ "S7-402", "Барнаул", "Москва", 2, 40.0 };
 
-    baggage::BaggagePiece first{ "БАГ-240001", "27.09.2026", 23.5, 55.0, 38.0, 22.0 };
-    first.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> first = std::make_shared<baggage::BaggagePiece>("БАГ-240001", "15.10.2026", 23.5, 55.0, 38.0, 22.0);
+    first->AcceptAtCheckIn();
     flight.AddBaggage(first);
 
-    baggage::BaggagePiece second{ "БАГ-240002", "27.09.2026", 18.0, 60.0, 40.0, 25.0 };
-    second.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> second = std::make_shared<baggage::BaggagePiece>("БАГ-240002", "15.10.2026", 18.0, 60.0, 40.0, 25.0);
+    second->AcceptAtCheckIn();
     flight.AddBaggage(second);
 
     std::cout << "\n--- 2. Нарушение правила 7: суммарный вес ---\n";
-    baggage::BaggagePiece third{ "БАГ-240003", "27.09.2026", 20.0, 45.0, 35.0, 25.0 };
-    third.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> third = std::make_shared<baggage::BaggagePiece>("БАГ-240003", "15.10.2026", 20.0, 45.0, 35.0, 25.0);
+    third->AcceptAtCheckIn();
     flight.AddBaggage(third);
 
-    baggage::BaggagePiece thirdLight{ "БАГ-240004", "27.09.2026", 1.5, 30.0, 20.0, 15.0 };
-    thirdLight.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> thirdLight = std::make_shared<baggage::BaggagePiece>("БАГ-240004", "15.10.2026", 1.5, 30.0, 20.0, 15.0);
+    thirdLight->AcceptAtCheckIn();
     flight.AddBaggage(thirdLight);
 
     std::cout << "\n--- 3. Нарушение правила 4: перевес 35 кг ---\n";
-    baggage::BaggagePiece heavy{ "БАГ-240005", "27.09.2026", 35.0, 60.0, 45.0, 30.0 };
-    heavy.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> heavy = std::make_shared<baggage::BaggagePiece>("БАГ-240005", "15.10.2026", 35.0, 60.0, 45.0, 30.0);
+    heavy->AcceptAtCheckIn();
 
     std::cout << "\n--- 4. Нарушение правила 7: манифест заполнен ---\n";
-    baggage::BaggagePiece fourth{ "БАГ-240006", "27.09.2026", 9.0, 40.0, 30.0, 20.0 };
-    fourth.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> fourth = std::make_shared<baggage::BaggagePiece>("БАГ-240006", "15.10.2026", 9.0, 40.0, 30.0, 20.0);
+    fourth->AcceptAtCheckIn();
     flight.AddBaggage(fourth);
 
     std::cout << "\n--- 5. Нарушение правила 9: регистрация закрыта ---\n";
     flight.CloseCheckIn();
-    baggage::BaggagePiece late{ "БАГ-240007", "27.09.2026", 12.0, 50.0, 40.0, 30.0 };
-    late.AcceptAtCheckIn();
+    std::shared_ptr<baggage::BaggagePiece> late = std::make_shared<baggage::BaggagePiece>("БАГ-240007", "15.10.2026", 12.0, 50.0, 40.0, 30.0);
+    late->AcceptAtCheckIn();
     flight.AddBaggage(late);
 
     std::cout << "\n--- 6. Манифест рейса после приёма ---\n";
     flight.PrintManifest();
 
-    std::cout << "\n--- 7. Ссылка и указатель: продвижение статусов (правило 12) ---\n";
-    baggage::BaggagePiece& firstRef = first;
-    firstRef.MarkStatus(baggage::BaggageStatus::eScreening);
-    firstRef.MarkStatus(baggage::BaggageStatus::eSorted);
-    firstRef.MarkStatus(baggage::BaggageStatus::eAccepted);
-
-    baggage::BaggagePiece* thirdPtr = &thirdLight;
-    thirdPtr->MarkStatus(baggage::BaggageStatus::eScreening);
-    thirdPtr->PrintState();
-
-    std::cout << "\n--- 8. Композиция: часть умирает вместе с целым ---\n";
+    std::cout << "\n--- 7. Композиция: часть умирает вместе с целым ---\n";
     std::cout << "Вход во вложенный блок\n";
     {
-        baggage::BaggagePiece temp{ "БАГ-240010", "28.09.2026", 21.0, 50.0, 40.0, 20.0 };
+        baggage::BaggagePiece temp{ "БАГ-240010", "16.10.2026", 21.0, 50.0, 40.0, 20.0 };
         temp.AcceptAtCheckIn();
         temp.PrintState();
     }
     std::cout << "Выход из вложенного блока: место и его бирка уничтожены вместе\n";
 
-    std::cout << "\n--- 9. Агрегация: место переживает рейс ---\n";
-    baggage::BaggagePiece kept{ "БАГ-240011", "28.09.2026", 24.0, 55.0, 40.0, 23.0 };
-    kept.AcceptAtCheckIn();
+    std::cout << "\n--- 8. Агрегация: место переживает рейс ---\n";
+    std::shared_ptr<baggage::BaggagePiece> kept = std::make_shared<baggage::BaggagePiece>("БАГ-240011", "16.10.2026", 24.0, 55.0, 40.0, 23.0);
+    kept->AcceptAtCheckIn();
     {
         baggage::Flight local{ "S7-210", "Барнаул", "Новосибирск", 5, 300.0 };
         local.AddBaggage(kept);
         local.PrintManifest();
     }
     std::cout << "Рейс S7-210 уничтожен, место багажа продолжает существовать:\n";
-    kept.PrintState();
+    kept->PrintState();
 
-    std::cout << "\n--- 10. Динамическое создание: new/delete ---\n";
-    baggage::BaggagePiece* dynamic = new baggage::BaggagePiece{ "БАГ-240020", "29.09.2026", 26.5, 65.0, 45.0, 25.0 };
+    std::cout << "\n--- 9. Динамическое создание: new/delete ---\n";
+    baggage::BaggagePiece* dynamic = new baggage::BaggagePiece{ "БАГ-240020", "16.10.2026", 26.5, 65.0, 45.0, 25.0 };
     dynamic->AcceptAtCheckIn();
     dynamic->PrintState();
     delete dynamic;
 
-    std::cout << "\n--- 11. Динамический массив объектов ---\n";
+    std::cout << "\n--- 10. Динамический массив объектов ---\n";
     baggage::BaggagePiece* batch = new baggage::BaggagePiece[3];
     batch[0].SetWeightKg(10.0);
     batch[0].SetDims(40.0, 30.0, 20.0);
@@ -99,10 +90,10 @@ int main()
     }
     delete[] batch;
 
-    std::cout << "\n--- 12. Массив динамических объектов ---\n";
+    std::cout << "\n--- 11. Массив динамических объектов ---\n";
     baggage::BaggagePiece** oversized = new baggage::BaggagePiece*[2];
-    oversized[0] = new baggage::BaggagePiece{ "БАГ-240031", "29.09.2026", 19.0, 70.0, 50.0, 30.0 };
-    oversized[1] = new baggage::BaggagePiece{ "БАГ-240032", "29.09.2026", 30.5, 80.0, 50.0, 28.0 };
+    oversized[0] = new baggage::BaggagePiece{ "БАГ-240031", "16.10.2026", 19.0, 70.0, 50.0, 30.0 };
+    oversized[1] = new baggage::BaggagePiece{ "БАГ-240032", "16.10.2026", 30.5, 80.0, 50.0, 28.0 };
     for (int i = 0; i < 2; ++i)
     {
         oversized[i]->AcceptAtCheckIn();
@@ -112,11 +103,11 @@ int main()
     delete oversized[1];
     delete[] oversized;
 
-    std::cout << "\n--- 13. Сверка бирки с отрывной частью при выдаче ---\n";
-    first.MarkStatus(baggage::BaggageStatus::eLoaded);
-    first.MarkStatus(baggage::BaggageStatus::eInTransit);
-    first.MarkStatus(baggage::BaggageStatus::eIssued);
-    first.PrintState();
+    std::cout << "\n--- 12. Сверка бирки с отрывной частью при выдаче ---\n";
+    first->MarkStatus(baggage::BaggageStatus::eLoaded);
+    first->MarkStatus(baggage::BaggageStatus::eInTransit);
+    first->MarkStatus(baggage::BaggageStatus::eIssued);
+    first->PrintState();
 
     std::cout << "\n=== Демонстрация завершена, выход из main: уничтожение оставшихся объектов ===\n";
     return 0;
