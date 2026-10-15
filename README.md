@@ -33,8 +33,8 @@ report/ — отчёты по работам (pdf)
 
 ### Java (JDK)
 
-    javac -d out java/src/baggage/*.java
-    java -cp out baggage.Main
+    javac -encoding UTF-8 -d out java/src/baggage/*.java
+    java -Dfile.encoding=UTF-8 -cp out baggage.Main
 
 ## ЛР2 — классы, агрегация и композиция (ветка lab-02)
 
@@ -53,6 +53,21 @@ report/ — отчёты по работам (pdf)
 `new`/`delete`, динамический массив объектов и массив динамических объектов.
 
 Эталонный вывод программы — `console_output.txt`.
+
+## ЛР3 ч.1 — перенос на Java (ветка lab-03-java)
+
+Классы (папка `java/src/baggage/`, package `baggage`, один класс — один файл):
+
+| Класс | Файл | Связь | Ответственность |
+|---|---|---|---|
+| `BaggageTag` | `BaggageTag.java` | часть места (композиция: место создаёт бирку в своём конструкторе и наружу не отдаёт) | уникальный номер, дата оформления, сверка с отрывной частью (правила 2, 10) |
+| `BaggageStatus` | `BaggageStatus.java` | — | enum статусов места багажа: описание и признак проблемного статуса (правило 12) |
+| `BaggagePiece` | `BaggagePiece.java` | целое для бирки | вес, габариты, статус; приём (правило 4); состояние — переопределённый `toString()` |
+| `Flight` | `Flight.java` | агрегация: `List<BaggagePiece>` из созданных снаружи мест | вместимость (правило 7), закрытие регистрации (правило 9) |
+| `BaggageLog` | `BaggageLog.java` | — | журнал обработки, `AutoCloseable`: освобождение ресурса через try-with-resources |
+| `Main` | `Main.java` | — | демонстрация: сценарий приёма, ссылки и копии, сборщик мусора (WeakReference + System.gc()) |
+
+Эталонный вывод Java-программы — `console_output_java.txt`.
 
 ## Предметная область
 
