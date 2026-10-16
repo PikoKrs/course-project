@@ -118,6 +118,11 @@ bool BaggagePiece::MarkStatus(BaggageStatus newStatus)
     return true;
 }
 
+bool BaggagePiece::VerifyTagAgainstStub(const std::string& stubNumber) const
+{
+    return m_tag.VerifyAgainstStub(stubNumber);
+}
+
 void BaggagePiece::SetDims(double lengthCm, double widthCm, double heightCm) noexcept
 {
     m_dimsSumCm = lengthCm + widthCm + heightCm;
