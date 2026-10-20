@@ -2,13 +2,15 @@
 // ФАЙЛ flight.hpp
 // Рейс: перевозка между двумя аэропортами с фиксированным номером.
 // Агрегатор мест багажа: рейс не создаёт места багажа и не уничтожает их,
-// он лишь хранит указатели на объекты, созданные вне его (агрегация).
+// он лишь хранит weak_ptr на объекты, которыми владеют другие (агрегация).
 //
 #pragma once
 
 #include <cstddef>
+#include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "baggage_piece.hpp"
 
@@ -38,13 +40,14 @@ public:
 
     [[nodiscard]] std::size_t GetPieceCount() const
     {
-        return m_count;
+        return AliveCount();
     }
 
     [[nodiscard]] double GetLoadedWeightKg() const;
 
-    // Назначить место багажа на рейс; проверяется вместимость отсека (правило 7)
-    bool AddPiece(BaggagePiece* piece);
+    // Назначить место багажа на рейс; проверяется вместимость отсека (правило 7).
+    // Рейс не владеет местом: в манифест попадает weak_ptr, жизнь места ему не продлевает
+    bool AddPiece(const std::shared_ptr<BaggagePiece>& piece);
 
     // Снять место багажа с рейса по номеру бирки (сценарий 3 предметной области)
     bool RemovePiece(std::string_view tagNumber);
@@ -58,12 +61,14 @@ public:
     void PrintManifest() const;
 
 private:
+    // Число записей манифеста, чьи места ещё живы
+    [[nodiscard]] std::size_t AliveCount() const;
+
     std::string m_number;
     std::string m_destination;
     std::size_t m_maxPieces{};
     double m_holdCapacityKg{};
-    BaggagePiece** m_pieces{}; // массив указателей: рейс не владеет местами багажа
-    std::size_t m_count{};
+    std::vector<std::weak_ptr<BaggagePiece>> m_pieces; // агрегация: рейс не владеет местами багажа
 };
 
 } // namespace baggage
