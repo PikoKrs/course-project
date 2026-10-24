@@ -1,25 +1,11 @@
 #pragma once
 
-#include "baggage_tag.hpp"
+#include "base_baggage.hpp"
 
 #include <string>
 
 namespace baggage
 {
-
-enum class BaggageStatus
-{
-    eNone = 0,
-    eAccepted,
-    eScreening,
-    eSorted,
-    eLoaded,
-    eInTransit,
-    eIssued,
-    eDelayed,
-    eLost,
-    eRemoved
-};
 
 class BaggagePiece
 {
