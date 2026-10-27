@@ -58,6 +58,17 @@ BaseBaggage::BaseBaggage(const std::string& tagNumber, const std::string& issueD
               << " см\n";
 }
 
+BaseBaggage::BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
+                         double dimsSumCm)
+    : m_tag{ tagNumber, issueDate }
+    , m_weightKg{ weightKg }
+    , m_dimsSumCm{ dimsSumCm }
+    , m_status{ BaggageStatus::eNone }
+{
+    std::cout << "[Базовый] Сформировано место багажа: вес " << m_weightKg << " кг, габариты " << m_dimsSumCm
+              << " см\n";
+}
+
 BaseBaggage::~BaseBaggage()
 {
     std::cout << "[Базовый] Место багажа " << m_tag.GetNumber() << " уничтожено (деструктор базы)\n";

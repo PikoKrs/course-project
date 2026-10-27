@@ -75,6 +75,19 @@ protected:
     double m_dimsSumCm;
     BaggageStatus m_status;
 
+    [[nodiscard]] const std::string& TagIssueDate() const noexcept
+    {
+        return m_tag.GetIssueDate();
+    }
+
+    [[nodiscard]] const BaggageTag& Tag() const noexcept
+    {
+        return m_tag;
+    }
+
+    explicit BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
+                         double dimsSumCm);
+
 private:
     [[nodiscard]] static const char* StatusName(BaggageStatus status) noexcept;
 };
