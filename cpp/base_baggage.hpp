@@ -3,6 +3,7 @@
 #include "baggage_norm.hpp"
 #include "baggage_tag.hpp"
 
+#include <memory>
 #include <string>
 
 namespace baggage
@@ -28,19 +29,20 @@ public:
     BaseBaggage();
     BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg, double lengthCm,
                 double widthCm, double heightCm);
-    BaseBaggage(const BaseBaggage&)            = delete;
-    BaseBaggage& operator=(const BaseBaggage&) = delete;
     virtual ~BaseBaggage();
+
+    [[nodiscard]] virtual std::unique_ptr<BaseBaggage> Clone() const = 0;
+
+    [[nodiscard]] virtual double ExcessFee(const BaggageNorm& norm) const = 0;
+
+    [[nodiscard]] virtual std::string Describe() const;
 
     bool AcceptAtCheckIn(const BaggageNorm& norm);
     bool MarkStatus(BaggageStatus newStatus);
     bool VerifyTagAgainstStub(const std::string& stubNumber) const;
+    void ReissueDate(const std::string& issueDate);
 
-    [[nodiscard]] const std::string& GetTagNumber() const noexcept
-    {
-        return m_tag.GetNumber();
-    }
-
+    [[nodiscard]] const std::string& GetTagNumber() const noexcept;
     [[nodiscard]] double GetWeightKg() const noexcept
     {
         return m_weightKg;
@@ -63,30 +65,28 @@ public:
 
     void SetDims(double lengthCm, double widthCm, double heightCm) noexcept;
 
-    [[nodiscard]] virtual double ExcessFee(const BaggageNorm& norm) const = 0;
-
-    [[nodiscard]] virtual std::string Describe() const;
-
     void PrintState() const;
 
 protected:
-    BaggageTag m_tag;
+    explicit BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
+                         double dimsSumCm);
+
+    BaseBaggage(const BaseBaggage&)            = default;
+    BaseBaggage& operator=(const BaseBaggage&) = default;
+    BaseBaggage(BaseBaggage&&) noexcept        = default;
+    BaseBaggage& operator=(BaseBaggage&&) noexcept = default;
+
+    std::shared_ptr<BaggageTag> m_tag;
     double m_weightKg;
     double m_dimsSumCm;
     BaggageStatus m_status;
 
-    [[nodiscard]] const std::string& TagIssueDate() const noexcept
-    {
-        return m_tag.GetIssueDate();
-    }
+    [[nodiscard]] const std::string& TagIssueDate() const noexcept;
 
     [[nodiscard]] const BaggageTag& Tag() const noexcept
     {
-        return m_tag;
+        return *m_tag;
     }
-
-    explicit BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
-                         double dimsSumCm);
 
 private:
     [[nodiscard]] static const char* StatusName(BaggageStatus status) noexcept;

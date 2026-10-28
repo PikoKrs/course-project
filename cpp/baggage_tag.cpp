@@ -34,6 +34,20 @@ BaggageTag::~BaggageTag()
     std::cout << "[Бирка] Бирка " << m_number << " уничтожена\n";
 }
 
+std::string BaggageTag::GenerateNumber()
+{
+    static int s_nextNumber = 240101;
+    const std::string number = "БАГ-" + std::to_string(s_nextNumber);
+    ++s_nextNumber;
+    return number;
+}
+
+void BaggageTag::ChangeIssueDate(const std::string& issueDate)
+{
+    m_issueDate = issueDate;
+    std::cout << "[Бирка] Бирка " << m_number << " переоформлена на дату " << m_issueDate << "\n";
+}
+
 bool BaggageTag::VerifyAgainstStub(const std::string& stubNumber) const
 {
     if (m_number == stubNumber)

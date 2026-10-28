@@ -18,9 +18,25 @@ StandardBaggage::StandardBaggage(const std::string& tagNumber, const std::string
     std::cout << "[Стандарт] Обычное место багажа по тарифу, сбор за перевес: " << kFeePerKg << " руб. за кг\n";
 }
 
+StandardBaggage::StandardBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
+                                 double dimsSumCm)
+    : BaseBaggage{ tagNumber, issueDate, weightKg, dimsSumCm }
+{
+    std::cout << "[Стандарт] Обычное место багажа по тарифу, сбор за перевес: " << kFeePerKg << " руб. за кг\n";
+}
+
 StandardBaggage::~StandardBaggage()
 {
     std::cout << "[Стандарт] Обычное место багажа " << GetTagNumber() << " уничтожено (деструктор наследника)\n";
+}
+
+std::unique_ptr<BaseBaggage> StandardBaggage::Clone() const
+{
+    auto clone = std::make_unique<StandardBaggage>(BaggageTag::GenerateNumber(), TagIssueDate(), m_weightKg,
+                                                   m_dimsSumCm);
+    clone->m_status = m_status;
+    std::cout << "[Стандарт] Глубокая копия: у места собственная бирка " << clone->GetTagNumber() << "\n";
+    return clone;
 }
 
 double StandardBaggage::ExcessFee(const BaggageNorm& norm) const

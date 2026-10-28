@@ -16,8 +16,15 @@ public:
 
     OversizeBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg, double lengthCm,
                     double widthCm, double heightCm, const std::string& itemName, double itemLengthCm);
+    OversizeBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg, double dimsSumCm,
+                    const std::string& itemName, double itemLengthCm);
+    OversizeBaggage(const OversizeBaggage& other);
+    OversizeBaggage& operator=(const OversizeBaggage& other);
+    OversizeBaggage(OversizeBaggage&& other) noexcept;
+    OversizeBaggage& operator=(OversizeBaggage&& other) noexcept;
     ~OversizeBaggage() override;
 
+    [[nodiscard]] std::unique_ptr<BaseBaggage> Clone() const override;
     [[nodiscard]] double ExcessFee(const BaggageNorm& norm) const override;
     [[nodiscard]] std::string Describe() const override;
 

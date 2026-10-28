@@ -13,9 +13,30 @@ FragileBaggage::FragileBaggage(const std::string& tagNumber, const std::string& 
     std::cout << "[Хрупкое] Оформлено хрупкое место багажа (акты о повреждении фиксируются по сценарию 5)\n";
 }
 
+FragileBaggage::FragileBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg,
+                               double dimsSumCm)
+    : BaseBaggage{ tagNumber, issueDate, weightKg, dimsSumCm }
+    , m_damageMarked{ false }
+{
+    std::cout << "[Хрупкое] Оформлено хрупкое место багажа (акты о повреждении фиксируются по сценарию 5)\n";
+}
+
 FragileBaggage::~FragileBaggage()
 {
     std::cout << "[Хрупкое] Хрупкое место багажа " << GetTagNumber() << " уничтожено (деструктор наследника)\n";
+}
+
+std::unique_ptr<BaseBaggage> FragileBaggage::Clone() const
+{
+    auto clone = std::make_unique<FragileBaggage>(BaggageTag::GenerateNumber(), TagIssueDate(), m_weightKg,
+                                                  m_dimsSumCm);
+    clone->m_status = m_status;
+    if (m_damageMarked)
+    {
+        clone->MarkDamaged();
+    }
+    std::cout << "[Хрупкое] Глубокая копия: у места собственная бирка " << clone->GetTagNumber() << "\n";
+    return clone;
 }
 
 double FragileBaggage::ExcessFee(const BaggageNorm& norm) const
