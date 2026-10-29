@@ -11,7 +11,7 @@ public class Flight {
     private final int capacityPlaces;
     private final double maxTotalWeightKg;
     private boolean checkInClosed;
-    private final List<BaggagePiece> manifest;
+    private final List<Baggage> manifest;
 
     public Flight(String number, String fromAirport, String toAirport, int capacityPlaces, double maxTotalWeightKg) {
         this.number = number;
@@ -33,7 +33,7 @@ public class Flight {
         return manifest.size();
     }
 
-    public boolean addBaggage(BaggagePiece piece) {
+    public boolean addBaggage(Baggage piece) {
         if (checkInClosed) {
             System.out.println("[Рейс] Отказ: регистрация на рейс " + number + " закрыта, приём багажа прекращён"
                     + " (правило 9)");
@@ -61,7 +61,7 @@ public class Flight {
     }
 
     public boolean removeBaggage(String tagNumber) {
-        Iterator<BaggagePiece> iterator = manifest.iterator();
+        Iterator<Baggage> iterator = manifest.iterator();
         while (iterator.hasNext()) {
             if (iterator.next().getTagNumber().equals(tagNumber)) {
                 iterator.remove();
@@ -87,14 +87,14 @@ public class Flight {
     public void printManifest() {
         System.out.println("[Рейс] Манифест рейса " + number + " (" + fromAirport + " -> " + toAirport + "): мест "
                 + manifest.size() + " из " + capacityPlaces);
-        for (BaggagePiece piece : manifest) {
+        for (Baggage piece : manifest) {
             System.out.println("  " + piece);
         }
     }
 
     private double loadedWeightKg() {
         double total = 0.0;
-        for (BaggagePiece piece : manifest) {
+        for (Baggage piece : manifest) {
             total += piece.getWeightKg();
         }
         return total;

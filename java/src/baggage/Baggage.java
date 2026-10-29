@@ -1,17 +1,18 @@
 package baggage;
 
-public class BaggagePiece {
-    private final BaggageTag tag;
-    private double weightKg;
-    private double dimsSumCm;
-    private BaggageStatus status;
+public abstract class Baggage {
+    protected final BaggageTag tag;
+    protected double weightKg;
+    protected double dimsSumCm;
+    protected BaggageStatus status;
 
-    public BaggagePiece(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
+    protected Baggage(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
         this.tag = new BaggageTag(tagNumber, issueDate);
         this.weightKg = weightKg;
         this.dimsSumCm = dimsSumCm;
         this.status = BaggageStatus.NONE;
-        System.out.println("[Место] Создано место багажа: вес " + weightKg + " кг, габариты " + dimsSumCm + " см");
+        System.out.println("[Базовый] Сформировано место багажа: вес " + weightKg + " кг, габариты " + dimsSumCm
+                + " см");
     }
 
     public String getTagNumber() {
@@ -22,26 +23,14 @@ public class BaggagePiece {
         return weightKg;
     }
 
-    public double getDimsSumCm() {
-        return dimsSumCm;
-    }
-
     public BaggageStatus getStatus() {
         return status;
     }
 
-    public void setWeightKg(double weightKg) {
-        this.weightKg = weightKg;
-    }
-
-    public void setDimsSumCm(double dimsSumCm) {
-        this.dimsSumCm = dimsSumCm;
-    }
-
-    public boolean acceptAtCheckIn() {
-        if (weightKg > 32.0) {
-            System.out.println("[Место] Отказ: вес места багажа " + weightKg + " кг превышает предельные 32 кг"
-                    + " (правило 4), место не принимается");
+    public boolean acceptAtCheckIn(BaggageNorm norm) {
+        if (weightKg > norm.getAbsoluteMaxWeightKg()) {
+            System.out.println("[Место] Отказ: вес места багажа " + weightKg + " кг превышает предельные "
+                    + norm.getAbsoluteMaxWeightKg() + " кг (правило 4), место не принимается");
             return false;
         }
 
@@ -52,8 +41,13 @@ public class BaggagePiece {
         }
 
         status = BaggageStatus.ACCEPTED;
-        System.out.println("[Место] Место багажа " + getTagNumber() + " принято на рейс (вес " + weightKg
-                + " кг), статус: принято");
+        double fee = excessFee(norm);
+        if (fee > 0.0) {
+            System.out.println("[Место] Место багажа " + getTagNumber() + " принято со сверхнормативом, сбор: " + fee
+                    + " руб.");
+        } else {
+            System.out.println("[Место] Место багажа " + getTagNumber() + " принято, укладывается в норму тарифа");
+        }
         return true;
     }
 
@@ -81,13 +75,20 @@ public class BaggagePiece {
         return true;
     }
 
-    public boolean verifyTagAgainstStub(String stubNumber) {
-        return tag.verifyAgainstStub(stubNumber);
+    public void reissueDate(String issueDate) {
+        tag.changeIssueDate(issueDate);
+    }
+
+    public abstract double excessFee(BaggageNorm norm);
+
+    public String describe() {
+        return "Место багажа " + getTagNumber() + ": вес " + weightKg + " кг, габариты " + dimsSumCm + " см, статус: "
+                + status.description();
     }
 
     @Override
     public String toString() {
-        return "Бирка " + getTagNumber() + ": вес " + weightKg + " кг, сумма габаритов " + dimsSumCm
-                + " см, статус: " + status.description();
+        return "Место багажа " + getTagNumber() + ": вес " + weightKg + " кг, габариты " + dimsSumCm + " см, статус: "
+                + status.description();
     }
 }
