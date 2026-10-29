@@ -22,6 +22,8 @@ public:
     bool RemoveBaggage(const std::string& tagNumber);
     void CloseCheckIn();
 
+    static void ParseNumber(const std::string& raw);
+
     [[nodiscard]] const std::string& GetNumber() const noexcept
     {
         return m_number;

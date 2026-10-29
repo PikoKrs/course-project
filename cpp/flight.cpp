@@ -84,6 +84,31 @@ void Flight::CloseCheckIn()
     std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
 }
 
+void Flight::ParseNumber(const std::string& raw)
+{
+    const std::size_t dashPos = raw.find('-');
+    if (dashPos == std::string::npos)
+    {
+        std::cout << "[Рейс] Строка \"" << raw << "\" не содержит разделитель \"-\": разбор невозможен\n";
+        return;
+    }
+
+    const std::string airline = raw.substr(0, dashPos);
+    const std::string number  = raw.substr(dashPos + 1);
+    std::cout << "[Рейс] Разбор строки \"" << raw << "\": авиакомпания \"" << airline << "\", номер \"" << number
+              << "\"\n";
+
+    if (airline == "S7")
+    {
+        const std::string systemName = "S7-" + number;
+        std::cout << "[Рейс] Рейс " << systemName << " найден в системе: авиакомпания S7 подтверждена\n";
+    }
+    else
+    {
+        std::cout << "[Рейс] Код \"" << airline << "\" не совпадает с \"S7\": требуется проверка тарифов\n";
+    }
+}
+
 void Flight::PrintManifest() const
 {
     std::cout << "[Рейс] Манифест рейса " << m_number << " (" << m_fromAirport << " -> " << m_toAirport << "): мест "
