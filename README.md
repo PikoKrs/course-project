@@ -69,6 +69,26 @@ report/ — отчёты по работам (pdf)
 
 Эталонный вывод Java-программы — `console_output_java.txt`.
 
+## ЛР4 ч.2 — наследование на Java (ветка lab-04-java)
+
+Иерархия (`java/src/baggage/`): `abstract Baggage` → `StandardBaggage`,
+`OversizeBaggage`, `final FragileBaggage`; `BaggageNorm`, `EquipmentSpec`.
+
+| Элемент | Где | Как демонстрируется |
+|---|---|---|
+| abstract + protected | `Baggage`: `protected final BaggageTag tag`, поля веса/статуса | наследники используют в `excessFee`/`describe` |
+| `super(...)` | конструкторы наследников | вызов конструктора базы, порядок виден по выводу |
+| переопределение | `StandardBaggage.describe()` через `super.describe()`; `OversizeBaggage`/`FragileBaggage` — без | дополнение vs замена |
+| final | `final class FragileBaggage` | запрет наследования |
+| поверхностная копия | `StandardBaggage(StandardBaggage other)` | копия делит бирку: номера совпадают, правило 2 нарушено |
+| глубокая копия | `OversizeBaggage(OversizeBaggage other)` | новая бирка (генератор) и новая спецификация |
+| this | `equals`, конструктор копирования | сравнение ссылок, обращение к своим полям |
+| статическое поле и метод | `BaggageTag.nextNumber`, `generateNumber()` | генератор уникальных номеров бирок |
+| equals/hashCode | `Baggage` | места равны, если совпадает номер бирки |
+| демонстрация | `Main.java` | список `Baggage` из наследников, полиморфные сборы |
+
+Эталонный вывод Java-программы — `console_output_java.txt`.
+
 ## Предметная область
 
 Полное описание — в отчёте по заданию 2: глоссарий, сущности и связи,
