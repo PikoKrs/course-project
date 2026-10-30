@@ -20,7 +20,16 @@ public abstract class Baggage {
                 + " см");
     }
 
-    public String getTagNumber() {
+    protected Baggage(BaggageTag readyTag, double weightKg, double dimsSumCm) {
+        this.tag = readyTag;
+        this.weightKg = weightKg;
+        this.dimsSumCm = dimsSumCm;
+        this.status = BaggageStatus.NONE;
+        System.out.println("[Базовый] Сформировано место багажа: вес " + weightKg + " кг, габариты " + dimsSumCm
+                + " см");
+    }
+
+    public final String getTagNumber() {
         return tag.getNumber();
     }
 

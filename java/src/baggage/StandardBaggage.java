@@ -10,9 +10,10 @@ public class StandardBaggage extends Baggage {
     }
 
     public StandardBaggage(StandardBaggage other) {
-        super(other.tag.getNumber(), other.tag.getIssueDate(), other.weightKg, other.dimsSumCm);
+        super(other.tag, other.weightKg, other.dimsSumCm);
         this.status = other.status;
-        System.out.println("[Стандарт] Поверхностная копия: бирка общая с оригиналом (номер " + getTagNumber() + ")");
+        System.out.println("[Стандарт] Поверхностная копия: копия делит бирку с оригиналом (номер " + getTagNumber()
+                + ")");
     }
 
     @Override
