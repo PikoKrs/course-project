@@ -1,6 +1,6 @@
 package baggage;
 
-public class FragileBaggage extends Baggage {    private boolean damageMarked;
+public final class FragileBaggage extends Baggage {    private boolean damageMarked;
 
     public FragileBaggage(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
         super(tagNumber, issueDate, weightKg, dimsSumCm);

@@ -54,11 +54,20 @@ public class Main {
         System.out.println("Изменение спецификации через копию не затронуло оригинал — копия глубокая");
 
         System.out.println();
-        System.out.println("--- 6. this: сравнение объекта с самим собой ---");
+        System.out.println("--- 6. this и сравнение объектов по содержимому (equals по номеру бирки) ---");
         System.out.println("shallowOrigin == shallowOrigin: " + (shallowOrigin == shallowOrigin));
+        System.out.println("shallowOrigin.equals(shallowCopy) по общему номеру бирки: "
+                + shallowOrigin.equals(shallowCopy));
+        System.out.println("shallowOrigin.equals(oversizeOrigin) по разным номерам: "
+                + shallowOrigin.equals(oversizeOrigin));
+        System.out.println("hashCode совпадает у равных объектов: " + (shallowOrigin.hashCode() == shallowCopy.hashCode()));
         System.out.println();
 
-        System.out.println("--- 7. Хрупкое место: пометка о повреждении (сценарий 5) ---");
+        System.out.println("--- 7. final: FragileBaggage запрещено наследовать ---");
+        System.out.println("FragileBaggage объявлен final class — подклассы не допускаются");
+        System.out.println();
+
+        System.out.println("--- 8. Хрупкое место: пометка о повреждении (сценарий 5) ---");
         FragileBaggage fragile = (FragileBaggage) loadout.get(3);
         fragile.markStatus(BaggageStatus.LOADED);
         fragile.markStatus(BaggageStatus.IN_TRANSIT);

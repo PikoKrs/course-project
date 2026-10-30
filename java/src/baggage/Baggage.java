@@ -6,6 +6,11 @@ public abstract class Baggage {
     protected double dimsSumCm;
     protected BaggageStatus status;
 
+    protected Baggage(String issueDate, double weightKg, double dimsSumCm) {
+        this(BaggageTag.generateNumber(), issueDate, weightKg, dimsSumCm);
+        System.out.println("[Базовый] Номер бирки выдан статическим генератором BaggageTag.generateNumber");
+    }
+
     protected Baggage(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
         this.tag = new BaggageTag(tagNumber, issueDate);
         this.weightKg = weightKg;
@@ -90,5 +95,24 @@ public abstract class Baggage {
     public String toString() {
         return "Место багажа " + getTagNumber() + ": вес " + weightKg + " кг, габариты " + dimsSumCm + " см, статус: "
                 + status.description();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof Baggage)) {
+            return false;
+        }
+
+        Baggage baggage = (Baggage) other;
+        return getTagNumber().equals(baggage.getTagNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return getTagNumber().hashCode();
     }
 }
