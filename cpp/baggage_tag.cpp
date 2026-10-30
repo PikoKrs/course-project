@@ -36,7 +36,7 @@ BaggageTag::~BaggageTag()
 
 std::string BaggageTag::GenerateNumber()
 {
-    static int s_nextNumber = 240101;
+    static int s_nextNumber = 240110;
     const std::string number = "БАГ-" + std::to_string(s_nextNumber);
     ++s_nextNumber;
     return number;

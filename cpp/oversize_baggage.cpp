@@ -1,6 +1,19 @@
-#include "oversize_baggage.hpp"
+﻿#include "oversize_baggage.hpp"
 
 #include <iostream>
+#include <sstream>
+
+namespace
+{
+
+std::string FormatNumber(double value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+} // namespace
 
 namespace baggage
 {
@@ -75,7 +88,15 @@ OversizeBaggage& OversizeBaggage::operator=(OversizeBaggage&& other) noexcept
 
 OversizeBaggage::~OversizeBaggage()
 {
-    std::cout << "[Негабарит] Негабаритное место багажа " << GetTagNumber() << " уничтожено (деструктор наследника)\n";
+    if (m_tag)
+    {
+        std::cout << "[Негабарит] Негабаритное место багажа " << GetTagNumber()
+                  << " уничтожено (деструктор наследника)\n";
+    }
+    else
+    {
+        std::cout << "[Негабарит] Освобождена перемещённая часть негабаритного места (деструктор наследника)\n";
+    }
 }
 
 std::unique_ptr<BaseBaggage> OversizeBaggage::Clone() const
@@ -97,7 +118,7 @@ double OversizeBaggage::ExcessFee(const BaggageNorm& norm) const
 std::string OversizeBaggage::Describe() const
 {
     return "Негабаритное место багажа " + GetTagNumber() + ": предмет " + m_spec->ToString() + ", вес "
-           + std::to_string(m_weightKg) + " кг, габариты " + std::to_string(m_dimsSumCm) + " см, фиксированный сбор";
+           + FormatNumber(m_weightKg) + " кг, габариты " + FormatNumber(m_dimsSumCm) + " см, фиксированный сбор";
 }
 
 void OversizeBaggage::RenameItem(const std::string& itemName, double itemLengthCm)

@@ -1,6 +1,19 @@
-#include "baggage_norm.hpp"
+﻿#include "baggage_norm.hpp"
 
 #include <iostream>
+#include <sstream>
+
+namespace
+{
+
+std::string FormatNumber(double value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+} // namespace
 
 namespace baggage
 {
@@ -20,8 +33,8 @@ BaggageNorm::BaggageNorm(double maxWeightKg, double maxDimsSumCm, double absolut
 
 std::string BaggageNorm::ToString() const
 {
-    return "норма: " + std::to_string(m_maxWeightKg) + " кг на место, " + std::to_string(m_maxDimsSumCm)
-           + " см габаритов, предельный вес " + std::to_string(m_absoluteMaxWeightKg) + " кг";
+    return "норма: " + FormatNumber(m_maxWeightKg) + " кг на место, " + FormatNumber(m_maxDimsSumCm)
+           + " см габаритов, предельный вес " + FormatNumber(m_absoluteMaxWeightKg) + " кг";
 }
 
 } // namespace baggage

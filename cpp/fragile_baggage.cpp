@@ -1,6 +1,19 @@
-#include "fragile_baggage.hpp"
+﻿#include "fragile_baggage.hpp"
 
 #include <iostream>
+#include <sstream>
+
+namespace
+{
+
+std::string FormatNumber(double value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+} // namespace
 
 namespace baggage
 {
@@ -49,11 +62,11 @@ std::string FragileBaggage::Describe() const
 {
     if (m_damageMarked)
     {
-        return "Хрупкое место багажа " + GetTagNumber() + ": вес " + std::to_string(m_weightKg)
+        return "Хрупкое место багажа " + GetTagNumber() + ": вес " + FormatNumber(m_weightKg)
                + " кг, статус: выдано с пометкой \"повреждено\" (сценарий 5)";
     }
 
-    return "Хрупкое место багажа " + GetTagNumber() + ": вес " + std::to_string(m_weightKg)
+    return "Хрупкое место багажа " + GetTagNumber() + ": вес " + FormatNumber(m_weightKg)
            + " кг, повреждений нет";
 }
 

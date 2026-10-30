@@ -1,9 +1,17 @@
-#include "base_baggage.hpp"
+﻿#include "base_baggage.hpp"
 
 #include <iostream>
+#include <sstream>
 
 namespace
 {
+
+std::string FormatNumber(double value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
 
 const char* StatusNameImpl(baggage::BaggageStatus status) noexcept
 {
@@ -167,8 +175,8 @@ void BaseBaggage::SetDims(double lengthCm, double widthCm, double heightCm) noex
 
 std::string BaseBaggage::Describe() const
 {
-    return "Место багажа " + GetTagNumber() + ": вес " + std::to_string(m_weightKg) + " кг, габариты "
-           + std::to_string(m_dimsSumCm) + " см, статус: " + StatusName(m_status);
+    return "Место багажа " + GetTagNumber() + ": вес " + FormatNumber(m_weightKg) + " кг, габариты "
+           + FormatNumber(m_dimsSumCm) + " см, статус: " + StatusName(m_status);
 }
 
 void BaseBaggage::PrintState() const

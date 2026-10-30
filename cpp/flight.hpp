@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 
-#include "baggage_piece.hpp"
+#include "base_baggage.hpp"
 
 #include <memory>
 #include <string>
@@ -18,7 +18,7 @@ public:
     Flight& operator=(const Flight&) = delete;
     ~Flight();
 
-    bool AddBaggage(const std::shared_ptr<BaggagePiece>& piece);
+    bool AddBaggage(const std::shared_ptr<BaseBaggage>& piece);
     bool RemoveBaggage(const std::string& tagNumber);
     void CloseCheckIn();
 
@@ -45,7 +45,7 @@ private:
     int m_capacityPlaces;
     double m_maxTotalWeightKg;
     bool m_checkInClosed;
-    std::vector<std::weak_ptr<BaggagePiece>> m_manifest;
+    std::vector<std::weak_ptr<BaseBaggage>> m_manifest;
 };
 
 } // namespace baggage

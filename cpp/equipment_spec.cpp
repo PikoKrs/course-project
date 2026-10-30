@@ -1,5 +1,19 @@
 #include "equipment_spec.hpp"
 
+#include <sstream>
+
+namespace
+{
+
+std::string FormatNumber(double value)
+{
+    std::ostringstream out;
+    out << value;
+    return out.str();
+}
+
+} // namespace
+
 namespace baggage
 {
 
@@ -17,7 +31,7 @@ void EquipmentSpec::ChangeItem(const std::string& itemName, double itemLengthCm)
 
 std::string EquipmentSpec::ToString() const
 {
-    return m_itemName + " (" + std::to_string(m_itemLengthCm) + " см)";
+    return m_itemName + " (" + FormatNumber(m_itemLengthCm) + " см)";
 }
 
 } // namespace baggage
