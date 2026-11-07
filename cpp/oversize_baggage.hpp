@@ -2,6 +2,7 @@
 
 #include "base_baggage.hpp"
 #include "equipment_spec.hpp"
+#include "is_scannable.hpp"
 
 #include <memory>
 #include <string>
@@ -9,7 +10,7 @@
 namespace baggage
 {
 
-class OversizeBaggage : public BaseBaggage
+class OversizeBaggage : public BaseBaggage, public IScannable
 {
 public:
     static constexpr double kFixedFee = 2500.0;
@@ -22,11 +23,13 @@ public:
     OversizeBaggage& operator=(const OversizeBaggage& other);
     OversizeBaggage(OversizeBaggage&& other) noexcept;
     OversizeBaggage& operator=(OversizeBaggage&& other) noexcept;
-    ~OversizeBaggage() override;
+    ~OversizeBaggage() noexcept override;
 
     [[nodiscard]] std::unique_ptr<BaseBaggage> Clone() const override;
     [[nodiscard]] double ExcessFee(const BaggageNorm& norm) const override;
     [[nodiscard]] std::string Describe() const override;
+
+    [[nodiscard]] std::string ScanBarcode() const noexcept override;
 
     void RenameItem(const std::string& itemName, double itemLengthCm);
 

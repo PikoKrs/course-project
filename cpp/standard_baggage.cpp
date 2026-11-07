@@ -25,9 +25,15 @@ StandardBaggage::StandardBaggage(const std::string& tagNumber, const std::string
     std::cout << "[Стандарт] Обычное место багажа по тарифу, сбор за перевес: " << kFeePerKg << " руб. за кг\n";
 }
 
-StandardBaggage::~StandardBaggage()
+StandardBaggage::~StandardBaggage() noexcept
 {
     std::cout << "[Стандарт] Обычное место багажа " << GetTagNumber() << " уничтожено (деструктор наследника)\n";
+}
+
+std::string StandardBaggage::ScanBarcode() const noexcept
+{
+    std::cout << "[Сканер] Считан штрих-код бирки обычного места: " << GetTagNumber() << "\n";
+    return GetTagNumber();
 }
 
 std::unique_ptr<BaseBaggage> StandardBaggage::Clone() const

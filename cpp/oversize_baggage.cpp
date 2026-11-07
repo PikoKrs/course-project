@@ -86,7 +86,7 @@ OversizeBaggage& OversizeBaggage::operator=(OversizeBaggage&& other) noexcept
     return *this;
 }
 
-OversizeBaggage::~OversizeBaggage()
+OversizeBaggage::~OversizeBaggage() noexcept
 {
     if (m_tag)
     {
@@ -124,6 +124,13 @@ std::string OversizeBaggage::Describe() const
 void OversizeBaggage::RenameItem(const std::string& itemName, double itemLengthCm)
 {
     m_spec->ChangeItem(itemName, itemLengthCm);
+}
+
+std::string OversizeBaggage::ScanBarcode() const noexcept
+{
+    std::cout << "[Сканер] Считан штрих-код бирки негабарита: " << GetTagNumber() << " (предмет: " << m_spec->ToString()
+              << ")\n";
+    return GetTagNumber();
 }
 
 } // namespace baggage
