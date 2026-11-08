@@ -2,6 +2,7 @@
 #include "fragile_baggage.hpp"
 #include "flight.hpp"
 #include "oversize_baggage.hpp"
+#include "sorting_system.hpp"
 #include "standard_baggage.hpp"
 
 #include <cstdlib>
@@ -93,7 +94,12 @@ int main()
     fragile->MarkDamaged();
     std::cout << fragile->Describe() << "\n";
 
-    std::cout << "\n--- 10. Уничтожение наследника через указатель на базовый класс ---\n";
+    std::cout << "\n--- 10. Сортировочная система через интерфейс IScannable ---\n";
+    baggage::SortingSystem sorting;
+    sorting.RouteBatchToLoading(loadout);
+    std::cout << "FragileBaggage не реализует IScannable — dynamic_cast вернул nullptr, место ушло на ручную обработку\n";
+
+    std::cout << "\n--- 11. Уничтожение наследника через указатель на базовый класс ---\n";
     std::cout << "loadout.back().reset(): вызван деструктор наследника, затем базы (виртуальный деструктор)\n";
     loadout.back().reset();
     std::cout << "\nКлон и копии уничтожаются при выходе из main — порядок: наследник, потом база\n";
