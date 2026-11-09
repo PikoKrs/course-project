@@ -1,4 +1,6 @@
 ﻿#include "base_baggage.hpp"
+#include "check_in_desk.hpp"
+#include "fee_policies.hpp"
 #include "fragile_baggage.hpp"
 #include "flight.hpp"
 #include "oversize_baggage.hpp"
@@ -98,6 +100,15 @@ int main()
     baggage::SortingSystem sorting;
     sorting.RouteBatchToLoading(loadout);
     std::cout << "FragileBaggage не реализует IScannable — dynamic_cast вернул nullptr, место ушло на ручную обработку\n";
+
+    std::cout << "\n--- 10a. Динамическое конфигурирование: смена политики сбора на ходу ---\n";
+    baggage::CheckInDesk desk{ "N1" };
+    baggage::StandardBaggage feeProbe{ "БАГ-240120", "09.11.2026", 26.0, 120.0 };
+    desk.RegisterPiece(feeProbe);
+    desk.SetFeePolicy(std::make_unique<baggage::PromoFeePolicy>());
+    desk.RegisterPiece(feeProbe);
+    desk.SetFeePolicy(std::make_unique<baggage::OversizeFeePolicy>());
+    desk.RegisterPiece(feeProbe);
 
     std::cout << "\n--- 11. Уничтожение наследника через указатель на базовый класс ---\n";
     std::cout << "loadout.back().reset(): вызван деструктор наследника, затем базы (виртуальный деструктор)\n";
