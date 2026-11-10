@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "baggage_rule_error.hpp"
+
 namespace baggage
 {
 
@@ -25,34 +27,30 @@ Flight::~Flight()
               << " (места багажа рейсу не принадлежат)\n";
 }
 
-bool Flight::AddBaggage(const std::shared_ptr<BaseBaggage>& piece)
+void Flight::AddBaggage(const std::shared_ptr<BaseBaggage>& piece)
 {
     if (m_checkInClosed)
     {
-        std::cout << "[Рейс] Отказ: регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
-        return false;
+        throw CheckinClosedError{ m_number };
     }
 
     if (LoadedCount() >= m_capacityPlaces)
     {
-        std::cout << "[Рейс] Отказ: вместимость отсека рейса " << m_number << " исчерпана (" << m_capacityPlaces
-                  << " мест), назначение места багажа " << piece->GetTagNumber() << " невозможно (правило 7)\n";
-        return false;
+        throw FlightCapacityError{ m_number, "все " + std::to_string(m_capacityPlaces) + " мест отсека заняты" };
     }
 
     const double newTotalWeight = LoadedWeightKg() + piece->GetWeightKg();
     if (newTotalWeight > m_maxTotalWeightKg)
     {
-        std::cout << "[Рейс] Отказ: суммарный вес багажа рейса " << m_number << " (" << newTotalWeight
-                  << " кг) превысил бы лимит " << m_maxTotalWeightKg << " кг (правило 7)\n";
-        return false;
+        throw FlightCapacityError{ m_number, "суммарный вес багажа " + std::to_string(newTotalWeight)
+                                                  + " кг превысил бы лимит " + std::to_string(m_maxTotalWeightKg)
+                                                  + " кг" };
     }
 
     m_manifest.emplace_back(piece);
     std::cout << "[Рейс] Место багажа " << piece->GetTagNumber() << " назначено на рейс " << m_number << " (мест: "
               << m_manifest.size() << " из " << m_capacityPlaces << ", вес: " << newTotalWeight << " из "
               << m_maxTotalWeightKg << " кг)\n";
-    return true;
 }
 
 bool Flight::RemoveBaggage(const std::string& tagNumber)
@@ -107,6 +105,42 @@ void Flight::ParseNumber(const std::string& raw)
     {
         std::cout << "[Рейс] Код \"" << airline << "\" не совпадает с \"S7\": требуется проверка тарифов\n";
     }
+}
+
+void Flight::LoadManifest()
+{
+    std::cout << "[Рейс] Загрузка манифеста рейса " << m_number << " в багажный отсек\n";
+
+    for (const std::weak_ptr<BaseBaggage>& entry : m_manifest)
+    {
+        const std::shared_ptr<BaseBaggage> piece = entry.lock();
+        if (!piece)
+        {
+            std::cout << "[Рейс] Место багажа недоступно (владелец его уничтожил), пропуск\n";
+            continue;
+        }
+
+        if (piece->GetStatus() < BaggageStatus::eSorted)
+        {
+            throw NotClearedError{ piece->GetTagNumber() };
+        }
+
+        piece->MarkStatus(BaggageStatus::eLoaded);
+        std::cout << "[Рейс] Место багажа " << piece->GetTagNumber() << " загружено в отсек рейса " << m_number << "\n";
+    }
+
+    std::cout << "[Рейс] Загрузка манифеста рейса " << m_number << " завершена\n";
+}
+
+void Flight::Assign(BaseBaggage& piece, const std::string& ticketRoute) const
+{
+    if (ticketRoute.find(m_number) == std::string::npos)
+    {
+        throw NotOnRouteError{ m_number, ticketRoute };
+    }
+
+    std::cout << "[Рейс] Место багажа " << piece.GetTagNumber() << " следует по маршруту " << ticketRoute
+              << ": рейс " << m_number << " входит в маршрут билета\n";
 }
 
 void Flight::PrintManifest() const

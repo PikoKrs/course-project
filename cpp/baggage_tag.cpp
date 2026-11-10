@@ -1,6 +1,9 @@
 #include "baggage_tag.hpp"
 
 #include <iostream>
+#include <set>
+
+#include "baggage_rule_error.hpp"
 
 namespace baggage
 {
@@ -18,15 +21,16 @@ BaggageTag::BaggageTag(const std::string& number, const std::string& issueDate)
 {
     if (m_number.empty())
     {
-        std::cout << "[Бирка] Отказ: номер бирки не может быть пустым (правило 2)\n";
-        m_number  = "000000";
-        m_issueDate = "-";
-        std::cout << "[Бирка] Выдана временная бирка 000000 (номер не присвоен)\n";
+        throw DuplicateTagError{ "номер бирки не может быть пустым" };
     }
-    else
+
+    static std::set<std::string> s_issuedNumbers;
+    if (!s_issuedNumbers.insert(m_number).second)
     {
-        std::cout << "[Бирка] Оформлена бирка " << m_number << " (дата " << m_issueDate << ")\n";
+        throw DuplicateTagError{ "номер бирки " + m_number + " уже выдан, номера бирок не повторяются" };
     }
+
+    std::cout << "[Бирка] Оформлена бирка " << m_number << " (дата " << m_issueDate << ")\n";
 }
 
 BaggageTag::~BaggageTag()

@@ -77,7 +77,7 @@ BaseBaggage::BaseBaggage(const std::string& tagNumber, const std::string& issueD
               << " см\n";
 }
 
-BaseBaggage::~BaseBaggage()
+BaseBaggage::~BaseBaggage() noexcept
 {
     if (m_tag)
     {
@@ -89,20 +89,17 @@ BaseBaggage::~BaseBaggage()
     }
 }
 
-bool BaseBaggage::AcceptAtCheckIn(const BaggageNorm& norm)
+void BaseBaggage::AcceptAtCheckIn(const BaggageNorm& norm)
 {
     if (m_weightKg > norm.GetAbsoluteMaxWeightKg())
     {
-        std::cout << "[Место] Отказ: вес места багажа " << m_weightKg << " кг превышает предельные "
-                  << norm.GetAbsoluteMaxWeightKg() << " кг (правило 4), место не принимается\n";
-        return false;
+        throw OverweightError{ m_weightKg };
     }
 
     if (m_status != BaggageStatus::eNone)
     {
-        std::cout << "[Место] Отказ: место багажа " << GetTagNumber() << " уже в обработке (статус: "
-                  << StatusName(m_status) << ")\n";
-        return false;
+        throw BaggageRuleError{ "место багажа " + GetTagNumber() + " уже в обработке (статус: " + StatusName(m_status)
+                                + "), повторный приём недопустим" };
     }
 
     m_status = BaggageStatus::eAccepted;
@@ -116,10 +113,9 @@ bool BaseBaggage::AcceptAtCheckIn(const BaggageNorm& norm)
     {
         std::cout << "[Место] Место багажа " << GetTagNumber() << " принято, укладывается в норму тарифа\n";
     }
-    return true;
 }
 
-bool BaseBaggage::MarkStatus(BaggageStatus newStatus)
+void BaseBaggage::MarkStatus(BaggageStatus newStatus)
 {
     const bool newIsProblem = newStatus == BaggageStatus::eDelayed || newStatus == BaggageStatus::eLost
                               || newStatus == BaggageStatus::eRemoved;
@@ -128,28 +124,25 @@ bool BaseBaggage::MarkStatus(BaggageStatus newStatus)
 
     if (newStatus == m_status)
     {
-        std::cout << "[Место] Бирка " << GetTagNumber() << ": статус уже " << StatusName(m_status) << "\n";
-        return false;
+        throw BaggageRuleError{ "правило 12: статус места багажа " + GetTagNumber() + " уже "
+                                + StatusName(m_status) };
     }
 
     if (m_status == BaggageStatus::eNone && newStatus != BaggageStatus::eAccepted)
     {
-        std::cout << "[Место] Отказ: место багажа " << GetTagNumber()
-                  << " ещё не принято, первый статус должен быть \"принято\" (правило 12)\n";
-        return false;
+        throw BaggageRuleError{ "правило 12: место багажа " + GetTagNumber()
+                                + " ещё не принято, первый статус должен быть \"принято\"" };
     }
 
     if (!newIsProblem && !currentIsProblem && newStatus != BaggageStatus::eNone
         && static_cast<int>(newStatus) < static_cast<int>(m_status))
     {
-        std::cout << "[Место] Отказ: статус места багажа не меняется в обратную сторону: " << StatusName(m_status)
-                  << " -> " << StatusName(newStatus) << " (правило 12)\n";
-        return false;
+        throw BaggageRuleError{ "правило 12: статус места багажа не меняется в обратную сторону: "
+                                + std::string{ StatusName(m_status) } + " -> " + StatusName(newStatus) };
     }
 
     m_status = newStatus;
     std::cout << "[Место] Бирка " << GetTagNumber() << ": новый статус: " << StatusName(newStatus) << "\n";
-    return true;
 }
 
 bool BaseBaggage::VerifyTagAgainstStub(const std::string& stubNumber) const

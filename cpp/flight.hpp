@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-
 namespace baggage
 {
 
@@ -18,9 +17,11 @@ public:
     Flight& operator=(const Flight&) = delete;
     ~Flight();
 
-    bool AddBaggage(const std::shared_ptr<BaseBaggage>& piece);
+    void AddBaggage(const std::shared_ptr<BaseBaggage>& piece);
     bool RemoveBaggage(const std::string& tagNumber);
     void CloseCheckIn();
+    void LoadManifest();
+    void Assign(BaseBaggage& piece, const std::string& ticketRoute) const;
 
     static void ParseNumber(const std::string& raw);
 

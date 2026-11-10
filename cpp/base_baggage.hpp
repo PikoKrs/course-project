@@ -1,11 +1,11 @@
 #pragma once
 
 #include "baggage_norm.hpp"
+#include "baggage_rule_error.hpp"
 #include "baggage_tag.hpp"
 
 #include <memory>
 #include <string>
-
 namespace baggage
 {
 
@@ -29,7 +29,7 @@ public:
     BaseBaggage();
     BaseBaggage(const std::string& tagNumber, const std::string& issueDate, double weightKg, double lengthCm,
                 double widthCm, double heightCm);
-    virtual ~BaseBaggage();
+    virtual ~BaseBaggage() noexcept;
 
     [[nodiscard]] virtual std::unique_ptr<BaseBaggage> Clone() const = 0;
 
@@ -37,8 +37,8 @@ public:
 
     [[nodiscard]] virtual std::string Describe() const;
 
-    bool AcceptAtCheckIn(const BaggageNorm& norm);
-    bool MarkStatus(BaggageStatus newStatus);
+    void AcceptAtCheckIn(const BaggageNorm& norm);
+    void MarkStatus(BaggageStatus newStatus);
     bool VerifyTagAgainstStub(const std::string& stubNumber) const;
     void ReissueDate(const std::string& issueDate);
 
