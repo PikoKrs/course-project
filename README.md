@@ -96,6 +96,24 @@ report/ — отчёты по работам (pdf)
 
 Эталонный вывод C++-программы — `console_output.txt`.
 
+## ЛР5 — полиморфизм C++ (ветка lab-05-cpp)
+
+| Элемент | Где | Как демонстрируется |
+|---|---|---|
+| интерфейс `IScannable` (только чисто виртуальные + virtual dtor) | `is_scannable.hpp` | контракт «место можно просканировать по штрих-коду» |
+| реализация интерфейса двумя классами | `StandardBaggage`, `OversizeBaggage` | оба умеют `ScanBarcode()` |
+| множественное наследование | `OversizeBaggage : BaseBaggage, IScannable` | абстрактный класс из ЛР4 + интерфейс |
+| работа через интерфейс | `SortingSystem::RouteToLoading` | не знает конкретных классов, только `IScannable` |
+| `dynamic_cast` | `SortingSystem` | только реализующие `IScannable` места уходят на загрузку, `FragileBaggage` — на ручную обработку |
+| раннее/позднее связывание | секция 3 вывода | невиртуальный `GetWeightKg()` vs виртуальный `Describe()` через `BaseBaggage&` |
+| динамическое конфигурирование | `CheckInDesk` + `IFeePolicy` | стойка хранит `unique_ptr<IFeePolicy>`, `SetFeePolicy()` меняет сбор на ходу: 1500 → 750 → 2500 руб. |
+| исключения | `baggage_rule_error.hpp` | `BaggageRuleError : std::logic_error` + `OverweightError`, `FlightCapacityError`, `NotClearedError`, `CheckinClosedError`, `NotOnRouteError`, `DuplicateTagError` |
+| try/catch | `main.cpp` | от частного к общему, перехват по `const&`, видно успех и перехват; без `catch (...)` |
+| noexcept | деструкторы и move-операции | помечены явно |
+
+Сборка: `cl /nologo /EHsc /utf-8 /std:c++17 cpp\*.cpp /Fe:baggage.exe`, запуск: `chcp 65001`, `baggage.exe`.
+Эталонный вывод — `console_output.txt`.
+
 ## Предметная область
 
 Полное описание — в отчёте по заданию 2: глоссарий, сущности и связи,
