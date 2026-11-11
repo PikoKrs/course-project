@@ -16,6 +16,13 @@ void SortingSystem::RouteToLoading(BaseBaggage& piece) const
         return;
     }
 
+    if (piece.GetStatus() >= BaggageStatus::eSorted)
+    {
+        std::cout << "[Сортировка] Место багажа " << piece.GetTagNumber()
+                  << " уже прошло сортировку, повторное направление не требуется\n";
+        return;
+    }
+
     const std::string barcode = scannable->ScanBarcode();
     piece.MarkStatus(BaggageStatus::eSorted);
     std::cout << "[Сортировка] Место багажа " << barcode << " направлено к загрузке, статус: отсортировано\n";

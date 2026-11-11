@@ -20,6 +20,7 @@ public:
 private:
     std::string m_deskName;
     std::unique_ptr<IFeePolicy> m_feePolicy;
+    BaggageNorm m_norm;
 };
 
 } // namespace baggage

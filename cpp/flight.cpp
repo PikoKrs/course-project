@@ -36,7 +36,8 @@ void Flight::AddBaggage(const std::shared_ptr<BaseBaggage>& piece)
 
     if (LoadedCount() >= m_capacityPlaces)
     {
-        throw FlightCapacityError{ m_number, "все " + std::to_string(m_capacityPlaces) + " мест отсека заняты" };
+        throw FlightCapacityError{ m_number, "вместимость отсека исчерпана (назначено " + std::to_string(m_capacityPlaces)
+                                                     + " мест)" };
     }
 
     const double newTotalWeight = LoadedWeightKg() + piece->GetWeightKg();
