@@ -88,6 +88,16 @@ public class Main {
         desk.registerPiece(feeProbe);
 
         System.out.println();
+        System.out.println("--- 11. Стандартный интерфейс Comparable: манифест по весу ---");
+        Flight flight = new Flight("S7-402", "Барнаул", "Москва", 5, 120.0);
+        flight.addBaggage(new StandardBaggage(BaggageTag.generateNumber(), "12.11.2026", 23.5, 115.0));
+        flight.addBaggage(new StandardBaggage(BaggageTag.generateNumber(), "12.11.2026", 12.0, 90.0));
+        flight.addBaggage(new StandardBaggage(BaggageTag.generateNumber(), "12.11.2026", 18.0, 110.0));
+        System.out.println("До сортировки:");
+        flight.printManifest();
+        flight.sortManifestByWeight();
+
+        System.out.println();
         System.out.println("=== Демонстрация завершена ===");
     }
 }

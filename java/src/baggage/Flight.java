@@ -92,6 +92,14 @@ public class Flight {
         }
     }
 
+    public void sortManifestByWeight() {
+        System.out.println("[Рейс] Сортировка манифеста рейса " + number + " по весу перед загрузкой:");
+        java.util.Collections.sort(manifest);
+        for (Baggage piece : manifest) {
+            System.out.println("  " + piece);
+        }
+    }
+
     private double loadedWeightKg() {
         double total = 0.0;
         for (Baggage piece : manifest) {

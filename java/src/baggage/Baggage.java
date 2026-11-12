@@ -1,6 +1,6 @@
 package baggage;
 
-public abstract class Baggage {
+public abstract class Baggage implements Comparable<Baggage> {
     protected final BaggageTag tag;
     protected double weightKg;
     protected double dimsSumCm;
@@ -95,6 +95,11 @@ public abstract class Baggage {
     public String toString() {
         return "Место багажа " + getTagNumber() + ": вес " + weightKg + " кг, габариты " + dimsSumCm + " см, статус: "
                 + status.description();
+    }
+
+    @Override
+    public int compareTo(Baggage other) {
+        return Double.compare(weightKg, other.weightKg);
     }
 
     @Override
