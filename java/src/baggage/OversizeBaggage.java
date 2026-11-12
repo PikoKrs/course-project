@@ -1,6 +1,6 @@
 package baggage;
 
-public class OversizeBaggage extends Baggage {
+public class OversizeBaggage extends Baggage implements Scannable {
     public static final double FIXED_FEE = 2500.0;
 
     protected final EquipmentSpec spec;
@@ -23,6 +23,13 @@ public class OversizeBaggage extends Baggage {
 
     public void renameItem(String itemName, double itemLengthCm) {
         spec.changeItem(itemName, itemLengthCm);
+    }
+
+    @Override
+    public String scanBarcode() {
+        System.out.println("[Сканер] Считан штрих-код бирки негабарита: " + getTagNumber() + " (предмет: " + spec
+                + ")");
+        return getTagNumber();
     }
 
     @Override

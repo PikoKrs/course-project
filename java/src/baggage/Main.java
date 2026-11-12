@@ -67,13 +67,25 @@ public class Main {
         System.out.println("FragileBaggage объявлен final class — подклассы не допускаются");
         System.out.println();
 
-        System.out.println("--- 8. Хрупкое место: пометка о повреждении (сценарий 5) ---");
-        FragileBaggage fragile = (FragileBaggage) loadout.get(3);
-        fragile.markStatus(BaggageStatus.LOADED);
-        fragile.markStatus(BaggageStatus.IN_TRANSIT);
-        fragile.markStatus(BaggageStatus.ISSUED);
-        fragile.markDamaged();
-        System.out.println(fragile.describe());
+        System.out.println("--- 8. Сортировка через интерфейс Scannable (instanceof) ---");
+        SortingSystem sorting = new SortingSystem();
+        sorting.routeBatchToLoading(loadout);
+        System.out.println("FragileBaggage не реализует Scannable — instanceof не сработал, место ушло на ручную обработку");
+        System.out.println();
+
+        System.out.println("--- 9. Раннее и позднее связывание ---");
+        System.out.println("final getTagNumber() — статическая (ранняя) привязка: " + loadout.get(0).getTagNumber());
+        System.out.println("describe() с @Override — динамическая (поздняя) привязка: " + loadout.get(0).describe());
+        System.out.println();
+
+        System.out.println("--- 10. Динамическое конфигурирование политики сбора ---");
+        CheckInDesk desk = new CheckInDesk("N1");
+        StandardBaggage feeProbe = new StandardBaggage("БАГ-240120", "12.11.2026", 26.0, 120.0);
+        desk.registerPiece(feeProbe);
+        desk.setFeePolicy(new PromoFeePolicy());
+        desk.registerPiece(feeProbe);
+        desk.setFeePolicy(new OversizeFeePolicy());
+        desk.registerPiece(feeProbe);
 
         System.out.println();
         System.out.println("=== Демонстрация завершена ===");

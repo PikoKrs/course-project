@@ -20,7 +20,7 @@ public abstract class Baggage {
                 + " см");
     }
 
-    public String getTagNumber() {
+    public final String getTagNumber() {
         return tag.getNumber();
     }
 

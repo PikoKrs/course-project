@@ -1,6 +1,6 @@
 package baggage;
 
-public class StandardBaggage extends Baggage {
+public class StandardBaggage extends Baggage implements Scannable {
     public static final double FEE_PER_KG = 500.0;
 
     public StandardBaggage(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
@@ -13,6 +13,12 @@ public class StandardBaggage extends Baggage {
         super(other.tag.getNumber(), other.tag.getIssueDate(), other.weightKg, other.dimsSumCm);
         this.status = other.status;
         System.out.println("[Стандарт] Поверхностная копия: бирка общая с оригиналом (номер " + getTagNumber() + ")");
+    }
+
+    @Override
+    public String scanBarcode() {
+        System.out.println("[Сканер] Считан штрих-код бирки обычного места: " + getTagNumber());
+        return getTagNumber();
     }
 
     @Override
