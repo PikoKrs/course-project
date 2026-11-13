@@ -89,6 +89,22 @@ report/ — отчёты по работам (pdf)
 
 Эталонный вывод Java-программы — `console_output_java.txt`.
 
+## ЛР5 ч.2 — полиморфизм Java (ветка lab-05-java)
+
+| Элемент | Где | Как демонстрируется |
+|---|---|---|
+| интерфейсы | `Scannable` (scanBarcode), `FeePolicy` (feeFor, name) | без префикса I — соглашение Java |
+| множественное наследование | `OversizeBaggage extends Baggage implements Scannable` | класс + интерфейс |
+| работа через интерфейс | `SortingSystem` | `instanceof Scannable`; `FragileBaggage` — на ручную обработку |
+| раннее/позднее связывание | секции 9 вывода | `final getTagNumber()` — ранняя привязка; `describe()` с `@Override` — поздняя |
+| динамическое конфигурирование | `CheckInDesk` + `FeePolicy` | `setFeePolicy()`: 1500 → 750 → 2500 руб. |
+| стандартный интерфейс | `Baggage implements Comparable<Baggage>` | `Collections.sort` — манифест по весу |
+| исключения | `BaggageRuleException extends RuntimeException` + `OverweightException`, `CheckinClosedException`, `FlightCapacityException`, `NotClearedException`, `NotOnRouteException`, `DuplicateTagException` | проверки правил бросают |
+| try/catch/finally | `Main.java` | от частного к общему; `finally`; try-with-resources с `BaggageLog` — close() при любом исходе |
+
+Сборка: `javac -encoding UTF-8 -d out java/src/baggage/*.java`, запуск: `java -Dfile.encoding=UTF-8 -cp out baggage.Main`.
+Эталонный вывод — `console_output_java.txt`.
+
 ## Предметная область
 
 Полное описание — в отчёте по заданию 2: глоссарий, сущности и связи,
