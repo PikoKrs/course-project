@@ -14,16 +14,19 @@ public class BaggageTag {
 
     public BaggageTag(String number, String issueDate) {
         if (number == null || number.isBlank()) {
-            System.out.println("[Бирка] Отказ: номер бирки не может быть пустым (правило 2)");
-            this.number = "000000";
-            this.issueDate = "-";
-            System.out.println("[Бирка] Выдана временная бирка 000000 (номер не присвоен)");
-        } else {
-            this.number = number;
-            this.issueDate = issueDate;
-            System.out.println("[Бирка] Оформлена бирка " + number + " (дата " + issueDate + ")");
+            throw new DuplicateTagException("номер бирки не может быть пустым");
         }
+
+        if (!issuedNumbers.add(number)) {
+            throw new DuplicateTagException("номер бирки " + number + " уже выдан, номера бирок не повторяются");
+        }
+
+        this.number = number;
+        this.issueDate = issueDate;
+        System.out.println("[Бирка] Оформлена бирка " + number + " (дата " + issueDate + ")");
     }
+
+    private static final java.util.Set<String> issuedNumbers = new java.util.HashSet<>();
 
     public String getNumber() {
         return number;

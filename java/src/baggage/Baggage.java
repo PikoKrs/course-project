@@ -32,17 +32,14 @@ public abstract class Baggage implements Comparable<Baggage> {
         return status;
     }
 
-    public boolean acceptAtCheckIn(BaggageNorm norm) {
+    public void acceptAtCheckIn(BaggageNorm norm) {
         if (weightKg > norm.getAbsoluteMaxWeightKg()) {
-            System.out.println("[Место] Отказ: вес места багажа " + weightKg + " кг превышает предельные "
-                    + norm.getAbsoluteMaxWeightKg() + " кг (правило 4), место не принимается");
-            return false;
+            throw new OverweightException(weightKg);
         }
 
         if (status != BaggageStatus.NONE) {
-            System.out.println("[Место] Отказ: место багажа " + getTagNumber() + " уже в обработке (статус: "
-                    + status.description() + ")");
-            return false;
+            throw new BaggageRuleException("место багажа " + getTagNumber() + " уже в обработке (статус: "
+                    + status.description() + "), повторный приём недопустим");
         }
 
         status = BaggageStatus.ACCEPTED;
@@ -53,31 +50,27 @@ public abstract class Baggage implements Comparable<Baggage> {
         } else {
             System.out.println("[Место] Место багажа " + getTagNumber() + " принято, укладывается в норму тарифа");
         }
-        return true;
     }
 
-    public boolean markStatus(BaggageStatus newStatus) {
+    public void markStatus(BaggageStatus newStatus) {
         if (newStatus == status) {
-            System.out.println("[Место] Бирка " + getTagNumber() + ": статус уже " + status.description());
-            return false;
+            throw new BaggageRuleException("правило 12: статус места багажа " + getTagNumber() + " уже "
+                    + status.description());
         }
 
         if (status == BaggageStatus.NONE && newStatus != BaggageStatus.ACCEPTED) {
-            System.out.println("[Место] Отказ: место багажа " + getTagNumber()
-                    + " ещё не принято, первый статус должен быть \"принято\" (правило 12)");
-            return false;
+            throw new BaggageRuleException("правило 12: место багажа " + getTagNumber()
+                    + " ещё не принято, первый статус должен быть \"принято\"");
         }
 
         if (!newStatus.isProblem() && !status.isProblem() && newStatus != BaggageStatus.NONE
                 && newStatus.ordinal() < status.ordinal()) {
-            System.out.println("[Место] Отказ: статус места багажа не меняется в обратную сторону: "
-                    + status.description() + " -> " + newStatus.description() + " (правило 12)");
-            return false;
+            throw new BaggageRuleException("правило 12: статус места багажа не меняется в обратную сторону: "
+                    + status.description() + " -> " + newStatus.description());
         }
 
         status = newStatus;
         System.out.println("[Место] Бирка " + getTagNumber() + ": новый статус: " + status.description());
-        return true;
     }
 
     public void reissueDate(String issueDate) {

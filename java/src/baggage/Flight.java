@@ -33,31 +33,26 @@ public class Flight {
         return manifest.size();
     }
 
-    public boolean addBaggage(Baggage piece) {
+    public void addBaggage(Baggage piece) {
         if (checkInClosed) {
-            System.out.println("[Рейс] Отказ: регистрация на рейс " + number + " закрыта, приём багажа прекращён"
-                    + " (правило 9)");
-            return false;
+            throw new CheckinClosedException(number);
         }
 
         if (loadedCount() >= capacityPlaces) {
-            System.out.println("[Рейс] Отказ: вместимость отсека рейса " + number + " исчерпана (" + capacityPlaces
-                    + " мест), назначение места багажа " + piece.getTagNumber() + " невозможно (правило 7)");
-            return false;
+            throw new FlightCapacityException(number,
+                    "вместимость отсека исчерпана (назначено " + capacityPlaces + " мест)");
         }
 
         double newTotalWeight = loadedWeightKg() + piece.getWeightKg();
         if (newTotalWeight > maxTotalWeightKg) {
-            System.out.println("[Рейс] Отказ: суммарный вес багажа рейса " + number + " (" + newTotalWeight
-                    + " кг) превысил бы лимит " + maxTotalWeightKg + " кг (правило 7)");
-            return false;
+            throw new FlightCapacityException(number, "суммарный вес багажа " + newTotalWeight
+                    + " кг превысил бы лимит " + maxTotalWeightKg + " кг");
         }
 
         manifest.add(piece);
         System.out.println("[Рейс] Место багажа " + piece.getTagNumber() + " назначено на рейс " + number + " (мест: "
                 + manifest.size() + " из " + capacityPlaces + ", вес: " + newTotalWeight + " из " + maxTotalWeightKg
                 + " кг)");
-        return true;
     }
 
     public boolean removeBaggage(String tagNumber) {
@@ -98,6 +93,29 @@ public class Flight {
         for (Baggage piece : manifest) {
             System.out.println("  " + piece);
         }
+    }
+
+    public void loadManifest() {
+        System.out.println("[Рейс] Загрузка манифеста рейса " + number + " в багажный отсек");
+        for (Baggage piece : manifest) {
+            if (piece.getStatus().ordinal() < BaggageStatus.SORTED.ordinal()) {
+                throw new NotClearedException(piece.getTagNumber());
+            }
+
+            piece.markStatus(BaggageStatus.LOADED);
+            System.out.println("[Рейс] Место багажа " + piece.getTagNumber() + " загружено в отсек рейса " + number);
+        }
+
+        System.out.println("[Рейс] Загрузка манифеста рейса " + number + " завершена");
+    }
+
+    public void assign(Baggage piece, String ticketRoute) {
+        if (!ticketRoute.contains(number)) {
+            throw new NotOnRouteException(number, ticketRoute);
+        }
+
+        System.out.println("[Рейс] Место багажа " + piece.getTagNumber() + " следует по маршруту " + ticketRoute
+                + ": рейс " + number + " входит в маршрут билета");
     }
 
     private double loadedWeightKg() {
