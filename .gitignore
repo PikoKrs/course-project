@@ -21,6 +21,10 @@ target/
 .vscode/
 cmake-build-debug/
 
+# Отчёты: в репо только итоговый pdf, json и docx — рабочие файлы
+report/*.json
+report/*.docx
+
 # ОС
 Thumbs.db
 .DS_Store
