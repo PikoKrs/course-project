@@ -73,25 +73,28 @@ report/ — отчёты по работам (pdf)
 
 Эталонный вывод C++-программы — `console_output.txt`.
 
-## ЛР4 ч.2 — наследование на Java (ветка lab-04-java)
+## ЛР4 — наследование C++ (ветка lab-04-cpp)
 
-Иерархия (`java/src/baggage/`): `abstract Baggage` → `StandardBaggage`,
-`OversizeBaggage`, `final FragileBaggage`; `BaggageNorm`, `EquipmentSpec`.
+Иерархия (папка `cpp/`): `BaseBaggage` (абстрактный) → `StandardBaggage`,
+`OversizeBaggage`, `FragileBaggage` (final); норма провоза — `BaggageNorm`,
+спецификация негабарита — `EquipmentSpec`.
 
 | Элемент | Где | Как демонстрируется |
 |---|---|---|
-| abstract + protected | `Baggage`: `protected final BaggageTag tag`, поля веса/статуса | наследники используют в `excessFee`/`describe` |
-| `super(...)` | конструкторы наследников | вызов конструктора базы, порядок виден по выводу |
-| переопределение | `StandardBaggage.describe()` через `super.describe()`; `OversizeBaggage`/`FragileBaggage` — без | дополнение vs замена |
-| final | `final class FragileBaggage` | запрет наследования |
-| поверхностная копия | `StandardBaggage(StandardBaggage other)` | копия делит бирку: номера совпадают, правило 2 нарушено |
-| глубокая копия | `OversizeBaggage(OversizeBaggage other)` | новая бирка (генератор) и новая спецификация |
-| this | `equals`, конструктор копирования | сравнение ссылок, обращение к своим полям |
-| статическое поле и метод | `BaggageTag.nextNumber`, `generateNumber()` | генератор уникальных номеров бирок |
-| equals/hashCode | `Baggage` | места равны, если совпадает номер бирки |
-| демонстрация | `Main.java` | список `Baggage` из наследников, полиморфные сборы |
+| абстрактный класс | `BaseBaggage` | чисто виртуальные `ExcessFee()` и `Clone()`; создание объекта невозможно |
+| protected | поля `m_tag`, `m_weightKg`, `m_dimsSumCm`, `m_status`, доступ наследников | наследники используют в `ExcessFee`/`Describe`, наружу не отдаются |
+| конструкторы | база → наследник в списке инициализации | по выводу: сначала `[Базовый]`, затем наследник |
+| виртуальный деструктор | `virtual ~BaseBaggage` | уничтожение через `unique_ptr<BaseBaggage>`: деструктор наследника, затем базы |
+| поверхностная копия | `StandardBaggage` (правило нуля) | копия делит `shared_ptr<BaggageTag>`: номера бирок совпадают, правило 2 нарушено |
+| глубокая копия | `OversizeBaggage` (правило пяти: copy/move/assign) + виртуальный `Clone()` | у копии новая бирка (генератор номеров) и собственная спецификация |
+| переопределение | `StandardBaggage::Describe()` вызывает `BaseBaggage::Describe()`, остальные — без | дополнение vs замена |
+| final | `FragileBaggage final` | запрет наследования хрупкого места |
+| строки | `Flight::ParseNumber` | `find`, `substr`, сравнение, конкатенация на номере рейса |
+| this | `OversizeBaggage::operator=` | защита самоприсваивания, возврат `*this` |
+| статические члены | `BaggageTag::GenerateNumber()` | статический счётчик, уникальные номера бирок (правило 2) |
+| демонстрация | `cpp/main.cpp` | массив `unique_ptr<BaseBaggage>`, приёмка через базовый указатель, полиморфные сборы |
 
-Эталонный вывод Java-программы — `console_output_java.txt`.
+Эталонный вывод C++-программы — `console_output.txt`.
 
 ## Предметная область
 

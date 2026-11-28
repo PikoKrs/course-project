@@ -1,4 +1,4 @@
-#include "flight.hpp"
+﻿#include "flight.hpp"
 
 #include <iostream>
 
@@ -25,7 +25,7 @@ Flight::~Flight()
               << " (места багажа рейсу не принадлежат)\n";
 }
 
-bool Flight::AddBaggage(const std::shared_ptr<BaggagePiece>& piece)
+bool Flight::AddBaggage(const std::shared_ptr<BaseBaggage>& piece)
 {
     if (m_checkInClosed)
     {
@@ -59,7 +59,7 @@ bool Flight::RemoveBaggage(const std::string& tagNumber)
 {
     for (std::size_t i = 0; i < m_manifest.size(); ++i)
     {
-        const std::shared_ptr<BaggagePiece> piece = m_manifest[i].lock();
+        const std::shared_ptr<BaseBaggage> piece = m_manifest[i].lock();
         if (piece && piece->GetTagNumber() == tagNumber)
         {
             std::cout << "[Рейс] Место багажа " << tagNumber << " снято с рейса " << m_number << "\n";
@@ -84,14 +84,39 @@ void Flight::CloseCheckIn()
     std::cout << "[Рейс] Регистрация на рейс " << m_number << " закрыта, приём багажа прекращён (правило 9)\n";
 }
 
+void Flight::ParseNumber(const std::string& raw)
+{
+    const std::size_t dashPos = raw.find('-');
+    if (dashPos == std::string::npos)
+    {
+        std::cout << "[Рейс] Строка \"" << raw << "\" не содержит разделитель \"-\": разбор невозможен\n";
+        return;
+    }
+
+    const std::string airline = raw.substr(0, dashPos);
+    const std::string number  = raw.substr(dashPos + 1);
+    std::cout << "[Рейс] Разбор строки \"" << raw << "\": авиакомпания \"" << airline << "\", номер \"" << number
+              << "\"\n";
+
+    if (airline == "S7")
+    {
+        const std::string systemName = "S7-" + number;
+        std::cout << "[Рейс] Рейс " << systemName << " найден в системе: авиакомпания S7 подтверждена\n";
+    }
+    else
+    {
+        std::cout << "[Рейс] Код \"" << airline << "\" не совпадает с \"S7\": требуется проверка тарифов\n";
+    }
+}
+
 void Flight::PrintManifest() const
 {
     std::cout << "[Рейс] Манифест рейса " << m_number << " (" << m_fromAirport << " -> " << m_toAirport << "): мест "
               << m_manifest.size() << " из " << m_capacityPlaces << "\n";
 
-    for (const std::weak_ptr<BaggagePiece>& entry : m_manifest)
+    for (const std::weak_ptr<BaseBaggage>& entry : m_manifest)
     {
-        const std::shared_ptr<BaggagePiece> piece = entry.lock();
+        const std::shared_ptr<BaseBaggage> piece = entry.lock();
         if (!piece)
         {
             std::cout << "  [Место] место багажа недоступно: владелец его уничтожил (weak_ptr lock() пуст)\n";
@@ -106,9 +131,9 @@ void Flight::PrintManifest() const
 double Flight::LoadedWeightKg() const noexcept
 {
     double total = 0.0;
-    for (const std::weak_ptr<BaggagePiece>& entry : m_manifest)
+    for (const std::weak_ptr<BaseBaggage>& entry : m_manifest)
     {
-        if (const std::shared_ptr<BaggagePiece> piece = entry.lock())
+        if (const std::shared_ptr<BaseBaggage> piece = entry.lock())
         {
             total += piece->GetWeightKg();
         }

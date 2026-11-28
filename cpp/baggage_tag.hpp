@@ -12,6 +12,8 @@ public:
     BaggageTag(const std::string& number, const std::string& issueDate);
     ~BaggageTag();
 
+    [[nodiscard]] static std::string GenerateNumber();
+
     [[nodiscard]] const std::string& GetNumber() const noexcept
     {
         return m_number;
@@ -21,6 +23,8 @@ public:
     {
         return m_issueDate;
     }
+
+    void ChangeIssueDate(const std::string& issueDate);
 
     bool VerifyAgainstStub(const std::string& stubNumber) const;
     void PrintInfo() const;
