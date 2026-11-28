@@ -2,7 +2,15 @@ package baggage;
 
 public class BaggageTag {
     private final String number;
-    private final String issueDate;
+    private String issueDate;
+
+    public static String generateNumber() {
+        int number = nextNumber;
+        nextNumber++;
+        return "БАГ-" + number;
+    }
+
+    private static int nextNumber = 240110;
 
     public BaggageTag(String number, String issueDate) {
         if (number == null || number.isBlank()) {
@@ -23,6 +31,11 @@ public class BaggageTag {
 
     public String getIssueDate() {
         return issueDate;
+    }
+
+    public void changeIssueDate(String issueDate) {
+        this.issueDate = issueDate;
+        System.out.println("[Бирка] Бирка " + number + " переоформлена на дату " + this.issueDate);
     }
 
     public boolean verifyAgainstStub(String stubNumber) {
