@@ -1,0 +1,93 @@
+package baggage;
+
+public class BaggagePiece {
+    private final BaggageTag tag;
+    private double weightKg;
+    private double dimsSumCm;
+    private BaggageStatus status;
+
+    public BaggagePiece(String tagNumber, String issueDate, double weightKg, double dimsSumCm) {
+        this.tag = new BaggageTag(tagNumber, issueDate);
+        this.weightKg = weightKg;
+        this.dimsSumCm = dimsSumCm;
+        this.status = BaggageStatus.NONE;
+        System.out.println("[Место] Создано место багажа: вес " + weightKg + " кг, габариты " + dimsSumCm + " см");
+    }
+
+    public String getTagNumber() {
+        return tag.getNumber();
+    }
+
+    public double getWeightKg() {
+        return weightKg;
+    }
+
+    public double getDimsSumCm() {
+        return dimsSumCm;
+    }
+
+    public BaggageStatus getStatus() {
+        return status;
+    }
+
+    public void setWeightKg(double weightKg) {
+        this.weightKg = weightKg;
+    }
+
+    public void setDimsSumCm(double dimsSumCm) {
+        this.dimsSumCm = dimsSumCm;
+    }
+
+    public boolean acceptAtCheckIn() {
+        if (weightKg > 32.0) {
+            System.out.println("[Место] Отказ: вес места багажа " + weightKg + " кг превышает предельные 32 кг"
+                    + " (правило 4), место не принимается");
+            return false;
+        }
+
+        if (status != BaggageStatus.NONE) {
+            System.out.println("[Место] Отказ: место багажа " + getTagNumber() + " уже в обработке (статус: "
+                    + status.description() + ")");
+            return false;
+        }
+
+        status = BaggageStatus.ACCEPTED;
+        System.out.println("[Место] Место багажа " + getTagNumber() + " принято на рейс (вес " + weightKg
+                + " кг), статус: принято");
+        return true;
+    }
+
+    public boolean markStatus(BaggageStatus newStatus) {
+        if (newStatus == status) {
+            System.out.println("[Место] Бирка " + getTagNumber() + ": статус уже " + status.description());
+            return false;
+        }
+
+        if (status == BaggageStatus.NONE && newStatus != BaggageStatus.ACCEPTED) {
+            System.out.println("[Место] Отказ: место багажа " + getTagNumber()
+                    + " ещё не принято, первый статус должен быть \"принято\" (правило 12)");
+            return false;
+        }
+
+        if (!newStatus.isProblem() && !status.isProblem() && newStatus != BaggageStatus.NONE
+                && newStatus.ordinal() < status.ordinal()) {
+            System.out.println("[Место] Отказ: статус места багажа не меняется в обратную сторону: "
+                    + status.description() + " -> " + newStatus.description() + " (правило 12)");
+            return false;
+        }
+
+        status = newStatus;
+        System.out.println("[Место] Бирка " + getTagNumber() + ": новый статус: " + status.description());
+        return true;
+    }
+
+    public boolean verifyTagAgainstStub(String stubNumber) {
+        return tag.verifyAgainstStub(stubNumber);
+    }
+
+    @Override
+    public String toString() {
+        return "Бирка " + getTagNumber() + ": вес " + weightKg + " кг, сумма габаритов " + dimsSumCm
+                + " см, статус: " + status.description();
+    }
+}
