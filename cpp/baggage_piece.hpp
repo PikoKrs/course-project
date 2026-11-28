@@ -31,6 +31,7 @@ public:
 
     bool AcceptAtCheckIn();
     bool MarkStatus(BaggageStatus newStatus);
+    bool VerifyTagAgainstStub(const std::string& stubNumber) const;
 
     [[nodiscard]] const std::string& GetTagNumber() const noexcept
     {
